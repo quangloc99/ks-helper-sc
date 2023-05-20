@@ -205,6 +205,7 @@ contract InputScalingHelper {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory newData) {
+    newData = encodedData;
     if (encodedData.length > 32) {
       PositiveSlippageFeeData memory psData = abi.decode(encodedData, (PositiveSlippageFeeData));
       psData.expectedReturnAmount = (psData.expectedReturnAmount * newAmount) / oldAmount;
@@ -214,7 +215,6 @@ contract InputScalingHelper {
       expectedReturnAmount = (expectedReturnAmount * newAmount) / oldAmount;
       newData = abi.encode(expectedReturnAmount);
     }
-    return newData;
   }
 
   function _flagsChecked(uint256 number, uint256 flag) internal pure returns (bool) {
