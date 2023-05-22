@@ -14,6 +14,12 @@ contract InputScalingHelper {
   uint256 private constant _BURN_FROM_TX_ORIGIN = 0x10;
   uint256 private constant _SIMPLE_SWAP = 0x20;
 
+  // fee data in case taking in dest token
+  struct PositiveSlippageFeeData {
+    uint256 partnerPSInfor; // [partnerReceiver (160 bit) + partnerPercent(96bits)]
+    uint256 expectedReturnAmount;
+  }
+
   struct Swap {
     bytes data;
     bytes4 functionSelector;
@@ -24,7 +30,7 @@ contract InputScalingHelper {
     uint256[] firstSwapAmounts;
     bytes[] swapDatas;
     uint256 deadline;
-    bytes destTokenFeeData;
+    bytes positiveSlippageData;
   }
 
   struct SwapExecutorDescription {
@@ -34,10 +40,13 @@ contract InputScalingHelper {
     uint256 minTotalAmountOut;
     address to;
     uint256 deadline;
-    bytes destTokenFeeData;
+    bytes positiveSlippageData;
   }
 
-  function getScaledInputData(bytes calldata inputData, uint256 newAmount) external pure returns (bytes memory) {
+  function getScaledInputData(
+    bytes calldata inputData,
+    uint256 newAmount
+  ) external pure returns (bytes memory) {
     bytes4 selector = bytes4(inputData[:4]);
     bytes memory dataToDecode = new bytes(inputData.length - 4);
     for (uint256 i = 0; i < inputData.length - 4; ++i) {
@@ -63,7 +72,10 @@ contract InputScalingHelper {
         IMetaAggregationRouterV2.SwapDescriptionV2 memory desc,
         bytes memory targetData,
         bytes memory clientData
-      ) = abi.decode(dataToDecode, (address, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes));
+      ) = abi.decode(
+          dataToDecode,
+          (address, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
+        );
 
       (desc, targetData) = _getScaledInputDataV2(desc, targetData, newAmount, true);
       return abi.encodeWithSelector(selector, callTarget, desc, targetData, clientData);
@@ -96,7 +108,7 @@ contract InputScalingHelper {
     );
   }
 
-  /// @dev Scale the swap description 
+  /// @dev Scale the swap description
   function _scaledSwapDescriptionV2(
     IMetaAggregationRouterV2.SwapDescriptionV2 memory desc,
     uint256 oldAmount,
@@ -110,7 +122,7 @@ contract InputScalingHelper {
     }
     return desc;
   }
-  
+
   /// @dev Scale the executorData in case swapSimpleMode
   function _scaledSimpleSwapData(
     bytes memory data,
@@ -121,6 +133,11 @@ contract InputScalingHelper {
     for (uint256 i = 0; i < swapData.firstPools.length; i++) {
       swapData.firstSwapAmounts[i] = (swapData.firstSwapAmounts[i] * newAmount) / oldAmount;
     }
+    swapData.positiveSlippageData = _scaledPositiveSlippageFeeData(
+      swapData.positiveSlippageData,
+      oldAmount,
+      newAmount
+    );
     return abi.encode(swapData);
   }
 
@@ -132,6 +149,12 @@ contract InputScalingHelper {
   ) internal pure returns (bytes memory) {
     SwapExecutorDescription memory executorDesc = abi.decode(data, (SwapExecutorDescription));
     executorDesc.minTotalAmountOut = (executorDesc.minTotalAmountOut * newAmount) / oldAmount;
+    executorDesc.positiveSlippageData = _scaledPositiveSlippageFeeData(
+      executorDesc.positiveSlippageData,
+      oldAmount,
+      newAmount
+    );
+
     for (uint256 i = 0; i < executorDesc.swapSequences.length; i++) {
       Swap memory swap = executorDesc.swapSequences[i][0];
       bytes4 functionSelector = swap.functionSelector;
@@ -175,6 +198,23 @@ contract InputScalingHelper {
       } else revert('AggregationExecutor: Dex type not supported');
     }
     return abi.encode(executorDesc);
+  }
+
+  function _scaledPositiveSlippageFeeData(
+    bytes memory encodedData,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory newData) {
+    newData = encodedData;
+    if (encodedData.length > 32) {
+      PositiveSlippageFeeData memory psData = abi.decode(encodedData, (PositiveSlippageFeeData));
+      psData.expectedReturnAmount = (psData.expectedReturnAmount * newAmount) / oldAmount;
+      newData = abi.encode(psData);
+    } else if (encodedData.length == 32) {
+      uint256 expectedReturnAmount = abi.decode(encodedData, (uint256));
+      expectedReturnAmount = (expectedReturnAmount * newAmount) / oldAmount;
+      newData = abi.encode(expectedReturnAmount);
+    }
   }
 
   function _flagsChecked(uint256 number, uint256 flag) internal pure returns (bool) {
