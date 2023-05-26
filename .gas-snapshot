@@ -1,0 +1,4 @@
+InputScalingTest:testSwapSimpleMode_Decrease() (gas: 2952912)
+InputScalingTest:testSwapSimpleMode_Increase() (gas: 2935382)
+InputScalingTest:testSwap_DecreaseETH() (gas: 2462574)
+InputScalingTest:testSwap_IncreaseETH() (gas: 2462550)

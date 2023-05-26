@@ -43,15 +43,13 @@ contract InputScalingHelper {
     bytes positiveSlippageData;
   }
 
-  function getScaledInputData(
-    bytes calldata inputData,
-    uint256 newAmount
-  ) external pure returns (bytes memory) {
+  function getScaledInputData(bytes calldata inputData, uint256 newAmount)
+    external
+    pure
+    returns (bytes memory)
+  {
     bytes4 selector = bytes4(inputData[:4]);
-    bytes memory dataToDecode = new bytes(inputData.length - 4);
-    for (uint256 i = 0; i < inputData.length - 4; ++i) {
-      dataToDecode[i] = inputData[i + 4];
-    }
+    bytes calldata dataToDecode = inputData[4:];
 
     if (selector == IMetaAggregationRouterV2.swap.selector) {
       IMetaAggregationRouterV2.SwapExecutionParams memory params = abi.decode(
@@ -117,8 +115,13 @@ contract InputScalingHelper {
     desc.minReturnAmount = (desc.minReturnAmount * newAmount) / oldAmount;
     if (desc.minReturnAmount == 0) desc.minReturnAmount = 1;
     desc.amount = newAmount;
-    for (uint256 i = 0; i < desc.srcReceivers.length; i++) {
+
+    uint256 nReceivers = desc.srcReceivers.length;
+    for (uint256 i = 0; i < nReceivers; ) {
       desc.srcAmounts[i] = (desc.srcAmounts[i] * newAmount) / oldAmount;
+      unchecked {
+        ++i;
+      }
     }
     return desc;
   }
@@ -130,8 +133,13 @@ contract InputScalingHelper {
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     SimpleSwapData memory swapData = abi.decode(data, (SimpleSwapData));
-    for (uint256 i = 0; i < swapData.firstPools.length; i++) {
+
+    uint256 nPools = swapData.firstPools.length;
+    for (uint256 i = 0; i < nPools; ) {
       swapData.firstSwapAmounts[i] = (swapData.firstSwapAmounts[i] * newAmount) / oldAmount;
+      unchecked {
+        ++i;
+      }
     }
     swapData.positiveSlippageData = _scaledPositiveSlippageFeeData(
       swapData.positiveSlippageData,
@@ -155,7 +163,8 @@ contract InputScalingHelper {
       newAmount
     );
 
-    for (uint256 i = 0; i < executorDesc.swapSequences.length; i++) {
+    uint256 nSequences = executorDesc.swapSequences.length;
+    for (uint256 i = 0; i < nSequences; ) {
       Swap memory swap = executorDesc.swapSequences[i][0];
       bytes4 functionSelector = swap.functionSelector;
 
@@ -173,6 +182,8 @@ contract InputScalingHelper {
         revert('InputScalingHelper: Can not scale RFQ swap');
       } else if (functionSelector == IExecutorHelper.executeBalV2Swap.selector) {
         swap.data = ScalingDataLib.newBalancerV2(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeWrappedstETHSwap.selector) {
+        swap.data = ScalingDataLib.newWrappedstETHSwap(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeDODOSwap.selector) {
         swap.data = ScalingDataLib.newDODO(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeVelodromeSwap.selector) {
@@ -187,8 +198,6 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newCamelot(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeKyberLimitOrder.selector) {
         revert('InputScalingHelper: Can not scale RFQ swap');
-      } else if (functionSelector == IExecutorHelper.executeWrappedstETHSwap.selector) {
-        swap.data = ScalingDataLib.newWrappedstETHSwap(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executePSMSwap.selector) {
         swap.data = ScalingDataLib.newPSM(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeFraxSwap.selector) {
@@ -196,25 +205,28 @@ contract InputScalingHelper {
       } else if (functionSelector == IExecutorHelper.executePlatypusSwap.selector) {
         swap.data = ScalingDataLib.newPlatypus(swap.data, oldAmount, newAmount);
       } else revert('AggregationExecutor: Dex type not supported');
+      unchecked {
+        ++i;
+      }
     }
     return abi.encode(executorDesc);
   }
 
   function _scaledPositiveSlippageFeeData(
-    bytes memory encodedData,
+    bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory newData) {
-    newData = encodedData;
-    if (encodedData.length > 32) {
-      PositiveSlippageFeeData memory psData = abi.decode(encodedData, (PositiveSlippageFeeData));
+    if (data.length > 32) {
+      PositiveSlippageFeeData memory psData = abi.decode(data, (PositiveSlippageFeeData));
       psData.expectedReturnAmount = (psData.expectedReturnAmount * newAmount) / oldAmount;
-      newData = abi.encode(psData);
-    } else if (encodedData.length == 32) {
-      uint256 expectedReturnAmount = abi.decode(encodedData, (uint256));
+      data = abi.encode(psData);
+    } else if (data.length == 32) {
+      uint256 expectedReturnAmount = abi.decode(data, (uint256));
       expectedReturnAmount = (expectedReturnAmount * newAmount) / oldAmount;
-      newData = abi.encode(expectedReturnAmount);
+      data = abi.encode(expectedReturnAmount);
     }
+    return data;
   }
 
   function _flagsChecked(uint256 number, uint256 flag) internal pure returns (bool) {
