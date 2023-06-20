@@ -154,4 +154,14 @@ library ScalingDataLib {
     frax.collectAmount = (frax.collectAmount * newAmount) / oldAmount;
     return abi.encode(frax);
   }
+
+  function newStETHSwap(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
 }

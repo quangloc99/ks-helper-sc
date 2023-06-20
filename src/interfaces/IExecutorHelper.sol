@@ -201,6 +201,12 @@ interface IExecutorHelper {
     uint256 previousAmountOut
   ) external payable returns (uint256);
 
+  function executeStEthSwap(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut
+  ) external payable returns (uint256);
+
   function executeSynthetixSwap(
     uint256 index,
     bytes memory data,

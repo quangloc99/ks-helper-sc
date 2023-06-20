@@ -184,6 +184,8 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newBalancerV2(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeWrappedstETHSwap.selector) {
         swap.data = ScalingDataLib.newWrappedstETHSwap(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeStEthSwap.selector) {
+        swap.data = ScalingDataLib.newStETHSwap(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeDODOSwap.selector) {
         swap.data = ScalingDataLib.newDODO(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeVelodromeSwap.selector) {
