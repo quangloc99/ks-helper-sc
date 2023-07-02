@@ -49,7 +49,10 @@ library ScalingDataLib {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
-    IExecutorHelper.UniSwapV3ProMM memory uniSwapV3ProMM = abi.decode(data, (IExecutorHelper.UniSwapV3ProMM));
+    IExecutorHelper.UniswapV3KSElastic memory uniSwapV3ProMM = abi.decode(
+      data,
+      (IExecutorHelper.UniswapV3KSElastic)
+    );
     uniSwapV3ProMM.swapAmount = (uniSwapV3ProMM.swapAmount * newAmount) / oldAmount;
 
     return abi.encode(uniSwapV3ProMM);
