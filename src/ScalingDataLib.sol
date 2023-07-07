@@ -167,4 +167,14 @@ library ScalingDataLib {
     amount = (amount * newAmount) / oldAmount;
     return abi.encode(amount);
   }
+
+  function newMaverick(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Maverick memory maverick = abi.decode(data, (IExecutorHelper.Maverick));
+    maverick.swapAmount = (maverick.swapAmount * newAmount) / oldAmount;
+    return abi.encode(maverick);
+  }
 }

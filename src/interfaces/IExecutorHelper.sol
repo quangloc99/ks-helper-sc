@@ -120,6 +120,15 @@ interface IExecutorHelper {
     bool isWrapping;
   }
 
+  struct Maverick {
+    address pool;
+    address tokenIn;
+    address tokenOut;
+    address recipient;
+    uint256 swapAmount;
+    uint256 sqrtPriceLimitD18;
+  }
+
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -211,6 +220,11 @@ interface IExecutorHelper {
   ) external payable returns (uint256);
 
   function executeKyberLimitOrder(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeMaverick(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
