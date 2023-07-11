@@ -49,7 +49,10 @@ library ScalingDataLib {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
-    IExecutorHelper.UniSwapV3ProMM memory uniSwapV3ProMM = abi.decode(data, (IExecutorHelper.UniSwapV3ProMM));
+    IExecutorHelper.UniswapV3KSElastic memory uniSwapV3ProMM = abi.decode(
+      data,
+      (IExecutorHelper.UniswapV3KSElastic)
+    );
     uniSwapV3ProMM.swapAmount = (uniSwapV3ProMM.swapAmount * newAmount) / oldAmount;
 
     return abi.encode(uniSwapV3ProMM);
@@ -153,5 +156,25 @@ library ScalingDataLib {
     IExecutorHelper.UniSwap memory frax = abi.decode(data, (IExecutorHelper.UniSwap));
     frax.collectAmount = (frax.collectAmount * newAmount) / oldAmount;
     return abi.encode(frax);
+  }
+
+  function newStETHSwap(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function newMaverick(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Maverick memory maverick = abi.decode(data, (IExecutorHelper.Maverick));
+    maverick.swapAmount = (maverick.swapAmount * newAmount) / oldAmount;
+    return abi.encode(maverick);
   }
 }
