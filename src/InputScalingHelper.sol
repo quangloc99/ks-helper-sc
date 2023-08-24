@@ -205,6 +205,12 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newPlatypus(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeMaverick.selector) {
         swap.data = ScalingDataLib.newMaverick(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeSyncSwap.selector) {
+        swap.data = ScalingDataLib.newSyncSwap(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeAlgebraV1.selector) {
+        swap.data = ScalingDataLib.newAlgebraV1(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeBalancerBatch.selector) {
+        swap.data = ScalingDataLib.newBalancerBatch(swap.data, oldAmount, newAmount);
       } else revert('AggregationExecutor: Dex type not supported');
       unchecked {
         ++i;

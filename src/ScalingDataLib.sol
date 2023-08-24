@@ -177,4 +177,37 @@ library ScalingDataLib {
     maverick.swapAmount = (maverick.swapAmount * newAmount) / oldAmount;
     return abi.encode(maverick);
   }
+
+  function newSyncSwap(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.SyncSwap memory syncSwap = abi.decode(data, (IExecutorHelper.SyncSwap));
+    syncSwap.collectAmount = (syncSwap.collectAmount * newAmount) / oldAmount;
+    return abi.encode(syncSwap);
+  }
+
+  function newAlgebraV1(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.AlgebraV1 memory algebraV1Swap = abi.decode(data, (IExecutorHelper.AlgebraV1));
+    algebraV1Swap.swapAmount = (algebraV1Swap.swapAmount * newAmount) / oldAmount;
+    return abi.encode(algebraV1Swap);
+  }
+
+  function newBalancerBatch(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.BalancerBatch memory balancerBatch = abi.decode(
+      data,
+      (IExecutorHelper.BalancerBatch)
+    );
+    balancerBatch.amountIn = (balancerBatch.amountIn * newAmount) / oldAmount;
+    return abi.encode(balancerBatch);
+  }
 }
