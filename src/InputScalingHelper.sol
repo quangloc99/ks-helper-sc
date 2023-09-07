@@ -211,6 +211,12 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newAlgebraV1(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeBalancerBatch.selector) {
         swap.data = ScalingDataLib.newBalancerBatch(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeWombat.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev struct Mantis is used for both Wombat and Mantis because of same fields
+      } else if (functionSelector == IExecutorHelper.executeMantis.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeIziSwap.selector) {
+        swap.data = ScalingDataLib.newIziSwap(swap.data, oldAmount, newAmount);
       } else revert('AggregationExecutor: Dex type not supported');
       unchecked {
         ++i;
