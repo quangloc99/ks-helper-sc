@@ -210,4 +210,24 @@ library ScalingDataLib {
     balancerBatch.amountIn = (balancerBatch.amountIn * newAmount) / oldAmount;
     return abi.encode(balancerBatch);
   }
+
+  function newMantis(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Mantis memory mantis = abi.decode(data, (IExecutorHelper.Mantis));
+    mantis.amount = (mantis.amount * newAmount) / oldAmount;
+    return abi.encode(mantis);
+  }
+
+  function newIziSwap(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.IziSwap memory iZi = abi.decode(data, (IExecutorHelper.IziSwap));
+    iZi.swapAmount = (iZi.swapAmount * newAmount) / oldAmount;
+    return abi.encode(iZi);
+  }
 }
