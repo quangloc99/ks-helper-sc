@@ -301,4 +301,9 @@ interface IExecutorHelper {
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
+
+  function executeWooFiV2(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
 }
