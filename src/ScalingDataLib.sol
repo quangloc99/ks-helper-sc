@@ -49,10 +49,8 @@ library ScalingDataLib {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
-    IExecutorHelper.UniswapV3KSElastic memory uniSwapV3ProMM = abi.decode(
-      data,
-      (IExecutorHelper.UniswapV3KSElastic)
-    );
+    IExecutorHelper.UniswapV3KSElastic memory uniSwapV3ProMM =
+      abi.decode(data, (IExecutorHelper.UniswapV3KSElastic));
     uniSwapV3ProMM.swapAmount = (uniSwapV3ProMM.swapAmount * newAmount) / oldAmount;
 
     return abi.encode(uniSwapV3ProMM);
@@ -203,10 +201,8 @@ library ScalingDataLib {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
-    IExecutorHelper.BalancerBatch memory balancerBatch = abi.decode(
-      data,
-      (IExecutorHelper.BalancerBatch)
-    );
+    IExecutorHelper.BalancerBatch memory balancerBatch =
+      abi.decode(data, (IExecutorHelper.BalancerBatch));
     balancerBatch.amountIn = (balancerBatch.amountIn * newAmount) / oldAmount;
     return abi.encode(balancerBatch);
   }
@@ -229,5 +225,18 @@ library ScalingDataLib {
     IExecutorHelper.IziSwap memory iZi = abi.decode(data, (IExecutorHelper.IziSwap));
     iZi.swapAmount = (iZi.swapAmount * newAmount) / oldAmount;
     return abi.encode(iZi);
+  }
+
+  function newTraderJoeV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.TraderJoeV2 memory traderJoe = abi.decode(data, (IExecutorHelper.TraderJoeV2));
+
+    // traderJoe.collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
+    traderJoe.collectAmount = (traderJoe.collectAmount & (1 << 255))
+      | ((uint256(traderJoe.collectAmount << 1 >> 1) * newAmount) / oldAmount);
+    return abi.encode(traderJoe);
   }
 }
