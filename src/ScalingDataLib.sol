@@ -230,4 +230,14 @@ library ScalingDataLib {
     iZi.swapAmount = (iZi.swapAmount * newAmount) / oldAmount;
     return abi.encode(iZi);
   }
+
+  function newTraderJoeV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.TraderJoeV2 memory traderJoe = abi.decode(data, (IExecutorHelper.TraderJoeV2));
+    traderJoe.collectAmount = (traderJoe.collectAmount * newAmount) / oldAmount;
+    return abi.encode(traderJoe);
+  }
 }

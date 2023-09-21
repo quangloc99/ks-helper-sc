@@ -219,6 +219,10 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newIziSwap(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeWooFiV2.selector) {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because WooFiV2 and Mantis have same fields
+      } else if (functionSelector == IExecutorHelper.executeTraderJoeV2.selector) {
+        swap.data = ScalingDataLib.newTraderJoeV2(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executePancakeStableSwap.selector) {
+        swap.data = ScalingDataLib.newCurveSwap(swap.data, oldAmount, newAmount);
       } else revert('AggregationExecutor: Dex type not supported');
       unchecked {
         ++i;
