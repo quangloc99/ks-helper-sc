@@ -233,7 +233,10 @@ library ScalingDataLib {
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     IExecutorHelper.TraderJoeV2 memory traderJoe = abi.decode(data, (IExecutorHelper.TraderJoeV2));
-    traderJoe.collectAmount = (traderJoe.collectAmount * newAmount) / oldAmount;
+
+    // traderJoe.collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
+    traderJoe.collectAmount = (traderJoe.collectAmount & (1 << 255))
+      | ((uint256(traderJoe.collectAmount << 1 >> 1) * newAmount) / oldAmount);
     return abi.encode(traderJoe);
   }
 }
