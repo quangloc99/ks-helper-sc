@@ -36,9 +36,7 @@ contract BaseInputScalingTest is Test {
     path = string(bytes.concat(bytes(root), _inputPath));
     string memory jsonData = vm.readFile(path);
     swap.encodedData = jsonData.readBytes(string(bytes.concat(testName, '.data')));
-    swap.executorAddress = jsonData.readAddress(
-      string(bytes.concat(testName, '.executorAddress'))
-    );
+    swap.executorAddress = jsonData.readAddress(string(bytes.concat(testName, '.executorAddress')));
     swap.blockNumber = jsonData.readUint(string(bytes.concat(testName, '.blockNumber')));
     swap.sender = jsonData.readAddress(string(bytes.concat(testName, '.sender')));
     swap.value = uint256(jsonData.readBytes32(string(bytes.concat(testName, '.value'))));
@@ -62,29 +60,27 @@ contract BaseInputScalingTest is Test {
         bytes memory executorData,
         bytes memory clientData
       ) = abi.decode(
-          dataToDecode,
-          (IAggregationExecutor, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
-        );
+        dataToDecode,
+        (IAggregationExecutor, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
+      );
       if (address(desc.srcToken) != ETH_ADDRESS) {
         desc.srcToken.approve(address(router), 1e27);
       }
-      (returnAmount, ) = router.swapSimpleMode(caller, desc, executorData, clientData);
+      (returnAmount,) = router.swapSimpleMode(caller, desc, executorData, clientData);
       vm.stopPrank();
     } else if (selector == IMetaAggregationRouterV2.swap.selector) {
       bytes memory dataToDecode = new bytes(inputData.length - 4);
       for (uint256 i = 0; i < inputData.length - 4; ++i) {
         dataToDecode[i] = inputData[i + 4];
       }
-      IMetaAggregationRouterV2.SwapExecutionParams memory execution = abi.decode(
-        dataToDecode,
-        (IMetaAggregationRouterV2.SwapExecutionParams)
-      );
+      IMetaAggregationRouterV2.SwapExecutionParams memory execution =
+        abi.decode(dataToDecode, (IMetaAggregationRouterV2.SwapExecutionParams));
 
       if (address(execution.desc.srcToken) != ETH_ADDRESS) {
         execution.desc.srcToken.approve(address(router), 1e27);
         value = 0;
       }
-      (returnAmount, ) = router.swap{value: value}(execution);
+      (returnAmount,) = router.swap{value: value}(execution);
       vm.stopPrank();
     }
   }

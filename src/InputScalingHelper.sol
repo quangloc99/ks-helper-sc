@@ -50,16 +50,11 @@ contract InputScalingHelper {
     bytes calldata dataToDecode = inputData[4:];
 
     if (selector == IMetaAggregationRouterV2.swap.selector) {
-      IMetaAggregationRouterV2.SwapExecutionParams memory params = abi.decode(
-        dataToDecode,
-        (IMetaAggregationRouterV2.SwapExecutionParams)
-      );
+      IMetaAggregationRouterV2.SwapExecutionParams memory params =
+        abi.decode(dataToDecode, (IMetaAggregationRouterV2.SwapExecutionParams));
 
       (params.desc, params.targetData) = _getScaledInputDataV2(
-        params.desc,
-        params.targetData,
-        newAmount,
-        _flagsChecked(params.desc.flags, _SIMPLE_SWAP)
+        params.desc, params.targetData, newAmount, _flagsChecked(params.desc.flags, _SIMPLE_SWAP)
       );
       return abi.encodeWithSelector(selector, params);
     } else if (selector == IMetaAggregationRouterV2.swapSimpleMode.selector) {
@@ -69,13 +64,14 @@ contract InputScalingHelper {
         bytes memory targetData,
         bytes memory clientData
       ) = abi.decode(
-          dataToDecode,
-          (address, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
-        );
+        dataToDecode, (address, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
+      );
 
       (desc, targetData) = _getScaledInputDataV2(desc, targetData, newAmount, true);
       return abi.encodeWithSelector(selector, callTarget, desc, targetData, clientData);
-    } else revert('InputScalingHelper: Invalid selector');
+    } else {
+      revert('InputScalingHelper: Invalid selector');
+    }
   }
 
   function _getScaledInputDataV2(
@@ -115,7 +111,7 @@ contract InputScalingHelper {
     desc.amount = newAmount;
 
     uint256 nReceivers = desc.srcReceivers.length;
-    for (uint256 i = 0; i < nReceivers; ) {
+    for (uint256 i = 0; i < nReceivers;) {
       desc.srcAmounts[i] = (desc.srcAmounts[i] * newAmount) / oldAmount;
       unchecked {
         ++i;
@@ -133,17 +129,14 @@ contract InputScalingHelper {
     SimpleSwapData memory swapData = abi.decode(data, (SimpleSwapData));
 
     uint256 nPools = swapData.firstPools.length;
-    for (uint256 i = 0; i < nPools; ) {
+    for (uint256 i = 0; i < nPools;) {
       swapData.firstSwapAmounts[i] = (swapData.firstSwapAmounts[i] * newAmount) / oldAmount;
       unchecked {
         ++i;
       }
     }
-    swapData.positiveSlippageData = _scaledPositiveSlippageFeeData(
-      swapData.positiveSlippageData,
-      oldAmount,
-      newAmount
-    );
+    swapData.positiveSlippageData =
+      _scaledPositiveSlippageFeeData(swapData.positiveSlippageData, oldAmount, newAmount);
     return abi.encode(swapData);
   }
 
@@ -154,14 +147,11 @@ contract InputScalingHelper {
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     SwapExecutorDescription memory executorDesc = abi.decode(data, (SwapExecutorDescription));
-    executorDesc.positiveSlippageData = _scaledPositiveSlippageFeeData(
-      executorDesc.positiveSlippageData,
-      oldAmount,
-      newAmount
-    );
+    executorDesc.positiveSlippageData =
+      _scaledPositiveSlippageFeeData(executorDesc.positiveSlippageData, oldAmount, newAmount);
 
     uint256 nSequences = executorDesc.swapSequences.length;
-    for (uint256 i = 0; i < nSequences; ) {
+    for (uint256 i = 0; i < nSequences;) {
       Swap memory swap = executorDesc.swapSequences[i][0];
       bytes4 functionSelector = bytes4(swap.selectorAndFlags);
 
@@ -223,7 +213,9 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newTraderJoeV2(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executePancakeStableSwap.selector) {
         swap.data = ScalingDataLib.newCurveSwap(swap.data, oldAmount, newAmount);
-      } else revert('AggregationExecutor: Dex type not supported');
+      } else {
+        revert('AggregationExecutor: Dex type not supported');
+      }
       unchecked {
         ++i;
       }
@@ -240,14 +232,14 @@ contract InputScalingHelper {
       PositiveSlippageFeeData memory psData = abi.decode(data, (PositiveSlippageFeeData));
       uint256 left = uint256(psData.expectedReturnAmount >> 128);
       uint256 right = uint256(uint128(psData.expectedReturnAmount)) * newAmount / oldAmount;
-      require(right <= type(uint128).max, "Exceeded type range");
+      require(right <= type(uint128).max, 'Exceeded type range');
       psData.expectedReturnAmount = right | left << 128;
       data = abi.encode(psData);
     } else if (data.length == 32) {
       uint256 expectedReturnAmount = abi.decode(data, (uint256));
       uint256 left = uint256(expectedReturnAmount >> 128);
       uint256 right = uint256(uint128(expectedReturnAmount)) * newAmount / oldAmount;
-      require(right <= type(uint128).max, "Exceeded type range");
+      require(right <= type(uint128).max, 'Exceeded type range');
       expectedReturnAmount = right | left << 128;
       data = abi.encode(expectedReturnAmount);
     }

@@ -180,7 +180,6 @@ interface IExecutorHelper {
     uint256 collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
   }
 
-
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
