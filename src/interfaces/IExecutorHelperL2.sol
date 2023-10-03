@@ -200,6 +200,16 @@ interface IExecutorHelperL2 {
     uint256 collectAmount; // most significant 1 bit is to determine whether pool is v2.0, else v2.1
   }
 
+  struct LevelFiV2 {
+    address pool;
+    address fromToken;
+    address toToken;
+    uint256 amountIn;
+    uint256 minAmountOut;
+    address recipient; // receive token out
+    address beneficier; // receive lyLVL
+  }
+
   function executeUniswap(
     uint256 index,
     bytes memory data,
@@ -435,6 +445,15 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeTraderJoeV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeLevelFiV2(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

@@ -239,4 +239,14 @@ library ScalingDataLib {
       | ((uint256(traderJoe.collectAmount << 1 >> 1) * newAmount) / oldAmount);
     return abi.encode(traderJoe);
   }
+
+  function newLevelFiV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.LevelFiV2 memory levelFiV2 = abi.decode(data, (IExecutorHelper.LevelFiV2));
+    levelFiV2.amountIn = (levelFiV2.amountIn * newAmount) / oldAmount;
+    return abi.encode(levelFiV2);
+  }
 }

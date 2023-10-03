@@ -84,4 +84,37 @@ contract DexReader4 is Common {
     swap.collectAmount |= (isV2 ? 1 : 0) << 255; // @dev set most significant bit
     return abi.encode(swap);
   }
+
+  function readLevelFiV2(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.LevelFiV2 memory swap;
+    // decode
+    (swap.pool, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    swap.fromToken = tokenIn;
+    (swap.toToken, startByte) = _readAddress(data, startByte);
+
+    if (isFirstDex) {
+      (swap.amountIn, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.amountIn = collect ? type(uint256).max : 0;
+    }
+
+    uint8 recipientFlag;
+    (recipientFlag, startByte) = _readUint8(data, startByte);
+    if (recipientFlag == 1) swap.recipient = nextPool;
+    else if (recipientFlag == 2) swap.recipient = address(this);
+    else (swap.recipient, startByte) = _readAddress(data, startByte);
+
+    return abi.encode(swap);
+  }
 }
