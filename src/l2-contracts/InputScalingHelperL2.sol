@@ -58,6 +58,7 @@ contract InputScalingHelperL2 {
     Hashflow,
     StableSwap,
     Curve,
+    PancakeStableSwap,
     UniswapV3KSElastic,
     BalancerV2,
     DODO,
@@ -76,6 +77,7 @@ contract InputScalingHelperL2 {
     iZiSwap,
     TraderJoeV2,
     WooFiV2,
+    KyberDSLO,
     LevelFiV2
   }
 
@@ -249,8 +251,12 @@ contract InputScalingHelperL2 {
         swap.data = swap.data.newTraderJoeV2(oldAmount, newAmount);
       } else if (DexIndex(functionSelectorIndex) == DexIndex.WooFiV2) {
         swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDSLO) {
+        revert('InputScalingHelper: Can not scale KyberDSLO swap');
       } else if (DexIndex(functionSelectorIndex) == DexIndex.LevelFiV2) {
         swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap) {
+        swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
       } else {
         revert('InputScaleHelper: Dex type not supported');
       }
