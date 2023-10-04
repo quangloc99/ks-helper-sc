@@ -429,4 +429,27 @@ contract DexScalersTest is Test {
       'results are not approx eq'
     );
   }
+
+  function test_scaleLevelFiV2(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2.LevelFiV2 memory swap;
+    swap.amountIn = oldAmount;
+    swap.toToken = MOCK_ADDRESS;
+
+    bytes memory compressed = writer.writeLevelFiV2(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newLevelFiV2(oldAmount, newAmount);
+
+    IExecutorHelperL2.LevelFiV2 memory swapScaled = abi.decode(
+      reader.readLevelFiV2(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2.LevelFiV2)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertApproxEqAbs(
+      swapScaled.amountIn,
+      (swap.amountIn * newAmount) / oldAmount,
+      oldAmount,
+      'results are not approx eq'
+    );
+  }
 }

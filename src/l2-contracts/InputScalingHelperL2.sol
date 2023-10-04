@@ -75,7 +75,8 @@ contract InputScalingHelperL2 {
     Wombat,
     iZiSwap,
     TraderJoeV2,
-    WooFiV2
+    WooFiV2,
+    LevelFiV2
   }
 
   function getScaledInputData(
@@ -248,6 +249,8 @@ contract InputScalingHelperL2 {
         swap.data = swap.data.newTraderJoeV2(oldAmount, newAmount);
       } else if (DexIndex(functionSelectorIndex) == DexIndex.WooFiV2) {
         swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.LevelFiV2) {
+        swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
       } else {
         revert('InputScaleHelper: Dex type not supported');
       }

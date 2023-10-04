@@ -180,6 +180,16 @@ interface IExecutorHelper {
     uint256 collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
   }
 
+  struct LevelFiV2 {
+    address pool;
+    address fromToken;
+    address toToken;
+    uint256 amountIn;
+    uint256 minAmountOut;
+    address recipient; // receive token out
+    address beneficier; // receive lyLVL
+  }
+
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -321,6 +331,11 @@ interface IExecutorHelper {
   ) external payable returns (uint256);
 
   function executePancakeStableSwap(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeLevelFiV2(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

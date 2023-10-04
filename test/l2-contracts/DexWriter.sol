@@ -384,6 +384,28 @@ contract DexWriter {
     }
   }
 
+  function writeLevelFiV2(
+    IExecutorHelperL2.LevelFiV2 memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex,
+    uint8 recipientFlag
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.pool));
+
+    shortData = bytes.concat(shortData, bytes20(swap.toToken));
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amountIn)));
+    else shortData = bytes.concat(shortData, bytes1(swap.amountIn > 0 ? 1 : 0));
+
+    if (recipientFlag == 1 || recipientFlag == 2) {
+      shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    } else {
+      shortData = bytes.concat(shortData, bytes1(uint8(0)));
+      shortData = bytes.concat(shortData, bytes20(swap.recipient));
+    }
+  }
+
   /*
    ************************ Utility ************************
    */
