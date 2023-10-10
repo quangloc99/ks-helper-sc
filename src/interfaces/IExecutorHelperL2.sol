@@ -210,6 +210,17 @@ interface IExecutorHelperL2 {
     address beneficier; // receive lyLVL
   }
 
+  struct GMXGLP {
+    address rewardRouter;
+    address stakedGLP;
+    address glpManager;
+    address yearnVault;
+    address tokenIn;
+    address tokenOut;
+    uint256 swapAmount;
+    address recipient;
+  }
+
   function executeUniswap(
     uint256 index,
     bytes memory data,
@@ -454,6 +465,15 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeLevelFiV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeGMXGLP(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

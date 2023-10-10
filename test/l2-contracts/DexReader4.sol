@@ -117,4 +117,41 @@ contract DexReader4 is Common {
 
     return abi.encode(swap);
   }
+
+  function readGMXGLP(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.GMXGLP memory swap;
+    (swap.rewardRouter, startByte) = _readPool(data, startByte);
+
+    (swap.stakedGLP, startByte) = _readAddress(data, startByte);
+
+    uint8 directionFlag;
+    (directionFlag, startByte) = _readUint8(data, startByte);
+    if (directionFlag == 0) swap.tokenOut = swap.stakedGLP;
+    else if (directionFlag == 1) (swap.tokenOut, startByte) = _readAddress(data, startByte);
+
+    // ignore glpManager
+    swap.tokenIn = tokenIn;
+
+    if (isFirstDex) {
+      (swap.swapAmount, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.swapAmount = collect ? type(uint256).max : 0;
+    }
+
+    uint8 recipientFlag;
+    (recipientFlag, startByte) = _readUint8(data, startByte);
+    if (recipientFlag == 1) swap.recipient = nextPool;
+    else if (recipientFlag == 2) swap.recipient = address(this);
+    else (swap.recipient, startByte) = _readAddress(data, startByte);
+    return abi.encode(swap);
+  }
 }

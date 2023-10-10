@@ -406,6 +406,35 @@ contract DexWriter {
     }
   }
 
+  function writeGMXGLP(
+    IExecutorHelperL2.GMXGLP memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex,
+    uint8 recipientFlag,
+    uint8 directionFlag
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.rewardRouter));
+
+    shortData = bytes.concat(shortData, bytes20(swap.yearnVault));
+
+    shortData = bytes.concat(shortData, bytes1(directionFlag));
+
+    if (directionFlag == 1) {
+      shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
+    }
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.swapAmount)));
+    else shortData = bytes.concat(shortData, bytes1(swap.swapAmount > 0 ? 1 : 0));
+
+    if (recipientFlag == 1 || recipientFlag == 2) {
+      shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    } else {
+      shortData = bytes.concat(shortData, bytes1(uint8(0)));
+      shortData = bytes.concat(shortData, bytes20(swap.recipient));
+    }
+  }
+
   /*
    ************************ Utility ************************
    */

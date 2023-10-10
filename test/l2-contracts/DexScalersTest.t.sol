@@ -452,4 +452,32 @@ contract DexScalersTest is Test {
       'results are not approx eq'
     );
   }
+
+  function test_scaleGMXGLP(
+    uint128 oldAmount,
+    uint128 newAmount,
+    uint8 recipientFlag,
+    uint8 directionFlag
+  ) public {
+    vm.assume(directionFlag < 2);
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2.GMXGLP memory swap;
+    swap.swapAmount = oldAmount;
+    swap.tokenOut = MOCK_ADDRESS;
+
+    bytes memory compressed = writer.writeGMXGLP(swap, 1, 0, recipientFlag, directionFlag);
+    bytes memory scaled = compressed.newGMXGLP(oldAmount, newAmount);
+
+    IExecutorHelperL2.GMXGLP memory swapScaled = abi.decode(
+      reader.readGMXGLP(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false), (IExecutorHelperL2.GMXGLP)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertApproxEqAbs(
+      swapScaled.swapAmount,
+      (swap.swapAmount * newAmount) / oldAmount,
+      oldAmount,
+      'results are not approx eq'
+    );
+  }
 }

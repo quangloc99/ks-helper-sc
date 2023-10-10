@@ -198,4 +198,12 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleLevelFiV2(oldAmount, newAmount);
   }
+
+  function newGMXGLP(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleGMXGLP(oldAmount, newAmount);
+  }
 }
