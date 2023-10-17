@@ -187,7 +187,6 @@ interface IExecutorHelper {
     uint256 amountIn;
     uint256 minAmountOut;
     address recipient; // receive token out
-    address beneficier; // receive lyLVL
   }
 
   struct GMXGLP {
