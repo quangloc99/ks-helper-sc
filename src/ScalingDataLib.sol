@@ -249,4 +249,14 @@ library ScalingDataLib {
     levelFiV2.amountIn = (levelFiV2.amountIn * newAmount) / oldAmount;
     return abi.encode(levelFiV2);
   }
+
+  function newGMXGLP(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.GMXGLP memory swapData = abi.decode(data, (IExecutorHelper.GMXGLP));
+    swapData.swapAmount = (swapData.swapAmount * newAmount) / oldAmount;
+    return abi.encode(swapData);
+  }
 }

@@ -58,7 +58,6 @@ contract InputScalingHelperL2 {
     Hashflow,
     StableSwap,
     Curve,
-    PancakeStableSwap,
     UniswapV3KSElastic,
     BalancerV2,
     DODO,
@@ -78,7 +77,9 @@ contract InputScalingHelperL2 {
     TraderJoeV2,
     WooFiV2,
     KyberDSLO,
-    LevelFiV2
+    LevelFiV2,
+    GMXGLP,
+    PancakeStableSwap
   }
 
   function getScaledInputData(
@@ -257,6 +258,8 @@ contract InputScalingHelperL2 {
         swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
       } else if (DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap) {
         swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.GMXGLP) {
+        swap.data = swap.data.newGMXGLP(oldAmount, newAmount);
       } else {
         revert('InputScaleHelper: Dex type not supported');
       }

@@ -228,6 +228,8 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newCurveSwap(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeLevelFiV2.selector) {
         swap.data = ScalingDataLib.newLevelFiV2(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeGMXGLP.selector) {
+        swap.data = ScalingDataLib.newGMXGLP(swap.data, oldAmount, newAmount);
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }
