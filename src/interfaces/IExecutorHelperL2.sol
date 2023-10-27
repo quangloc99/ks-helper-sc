@@ -220,6 +220,30 @@ interface IExecutorHelperL2 {
     address recipient;
   }
 
+  struct Vooi {
+    address pool;
+    address fromToken;
+    address toToken;
+    uint256 fromID;
+    uint256 toID;
+    uint256 fromAmount;
+    address to;
+  }
+
+  struct VelocoreV2 {
+    address vault;
+    address tokenIn;
+    address tokenOut;
+    uint256 amount;
+  }
+
+  struct MaticMigrate {
+    address pool;
+    address tokenAddress; // should be POL
+    uint256 amount;
+    address recipient; // empty if migrate
+  }
+
   function executeUniswap(
     uint256 index,
     bytes memory data,
@@ -473,6 +497,33 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeGMXGLP(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeVooi(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeVelocoreV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeSmardex(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

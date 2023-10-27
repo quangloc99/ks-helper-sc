@@ -480,4 +480,49 @@ contract DexScalersTest is Test {
       'results are not approx eq'
     );
   }
+
+  function test_scaleVooi(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2.Vooi memory swap;
+    swap.fromAmount = oldAmount;
+    swap.toToken = MOCK_ADDRESS;
+
+    bytes memory compressed = writer.writeVooi(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newVooi(oldAmount, newAmount);
+
+    IExecutorHelperL2.Vooi memory swapScaled = abi.decode(
+      reader.readVooi(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false), (IExecutorHelperL2.Vooi)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertApproxEqAbs(
+      swapScaled.fromAmount,
+      (swap.fromAmount * newAmount) / oldAmount,
+      oldAmount,
+      'results are not approx eq'
+    );
+  }
+
+  function test_scaleVelocoreV2(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2.VelocoreV2 memory swap;
+    swap.amount = oldAmount;
+    swap.tokenOut = MOCK_ADDRESS;
+
+    bytes memory compressed = writer.writeVelocoreV2(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newVelocoreV2(oldAmount, newAmount);
+
+    IExecutorHelperL2.VelocoreV2 memory swapScaled = abi.decode(
+      reader.readVelocoreV2(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2.VelocoreV2)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertApproxEqAbs(
+      swapScaled.amount,
+      (swap.amount * newAmount) / oldAmount,
+      oldAmount,
+      'results are not approx eq'
+    );
+  }
 }

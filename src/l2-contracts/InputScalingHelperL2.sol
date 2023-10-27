@@ -79,7 +79,10 @@ contract InputScalingHelperL2 {
     KyberDSLO,
     LevelFiV2,
     GMXGLP,
-    PancakeStableSwap
+    PancakeStableSwap,
+    Vooi,
+    VelocoreV2,
+    Smardex
   }
 
   function getScaledInputData(
@@ -260,6 +263,12 @@ contract InputScalingHelperL2 {
         swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
       } else if (DexIndex(functionSelectorIndex) == DexIndex.GMXGLP) {
         swap.data = swap.data.newGMXGLP(oldAmount, newAmount);
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.Vooi) {
+        swap.data = swap.data.newVooi(oldAmount, newAmount);
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.VelocoreV2) {
+        swap.data = swap.data.newVelocoreV2(oldAmount, newAmount);
+      } else if (DexIndex(functionSelectorIndex) == DexIndex.Smardex) {
+        swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
       } else {
         revert('InputScaleHelper: Dex type not supported');
       }
