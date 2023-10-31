@@ -230,6 +230,14 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newLevelFiV2(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeGMXGLP.selector) {
         swap.data = ScalingDataLib.newGMXGLP(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeVooi.selector) {
+        swap.data = ScalingDataLib.newVooi(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeVelocoreV2.selector) {
+        swap.data = ScalingDataLib.newVelocoreV2(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeMaticMigrate.selector) {
+        swap.data = ScalingDataLib.newMaticMigrate(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeSmardex.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Smardex and Mantis have same fields
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }

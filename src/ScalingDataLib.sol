@@ -259,4 +259,35 @@ library ScalingDataLib {
     swapData.swapAmount = (swapData.swapAmount * newAmount) / oldAmount;
     return abi.encode(swapData);
   }
+
+  function newVooi(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Vooi memory vooi = abi.decode(data, (IExecutorHelper.Vooi));
+    vooi.fromAmount = (vooi.fromAmount * newAmount) / oldAmount;
+    return abi.encode(vooi);
+  }
+
+  function newVelocoreV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.VelocoreV2 memory velocorev2 = abi.decode(data, (IExecutorHelper.VelocoreV2));
+    velocorev2.amount = (velocorev2.amount * newAmount) / oldAmount;
+    return abi.encode(velocorev2);
+  }
+
+  function newMaticMigrate(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.MaticMigrate memory maticMigrate =
+      abi.decode(data, (IExecutorHelper.MaticMigrate));
+    maticMigrate.amount = (maticMigrate.amount * newAmount) / oldAmount;
+    return abi.encode(maticMigrate);
+  }
 }

@@ -398,4 +398,39 @@ library DexScaler {
       startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleGMXGLP'
     );
   }
+
+  function scaleVooi(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (, startByte) = data._readUint8(startByte); // toId
+
+    (uint256 fromAmount,) = data._readUint128AsUint256(startByte); // amount
+
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (fromAmount * newAmount) / oldAmount, 'scaleVooi'
+    );
+  }
+
+  function scaleVelocoreV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (, startByte) = data._readAddress(startByte); // tokenOut
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleVelocoreV2'
+    );
+  }
 }

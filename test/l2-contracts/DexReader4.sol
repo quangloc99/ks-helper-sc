@@ -154,4 +154,66 @@ contract DexReader4 is Common {
     else (swap.recipient, startByte) = _readAddress(data, startByte);
     return abi.encode(swap);
   }
+
+  function readVooi(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.Vooi memory swap;
+    // decode
+    (swap.pool, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    swap.fromToken = tokenIn;
+    uint8 _toID;
+    (_toID, startByte) = _readUint8(data, startByte);
+
+    swap.toID = uint256(_toID);
+
+    if (isFirstDex) {
+      (swap.fromAmount, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.fromAmount = collect ? type(uint256).max : 0;
+    }
+
+    uint8 recipientFlag;
+    (recipientFlag, startByte) = _readUint8(data, startByte);
+    if (recipientFlag == 1) swap.to = nextPool;
+    else if (recipientFlag == 2) swap.to = address(this);
+    else (swap.to, startByte) = _readAddress(data, startByte);
+
+    return abi.encode(swap);
+  }
+
+  function readVelocoreV2(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.VelocoreV2 memory swap;
+    // decode
+    (swap.vault, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    swap.tokenIn = tokenIn;
+    (swap.tokenOut, startByte) = _readAddress(data, startByte);
+
+    if (isFirstDex) {
+      (swap.amount, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.amount = collect ? type(uint256).max : 0;
+    }
+    return abi.encode(swap);
+  }
 }
