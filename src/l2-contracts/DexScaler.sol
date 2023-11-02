@@ -25,9 +25,7 @@ library DexScaler {
     (, startByte) = data._readRecipient(startByte);
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleUniSwap'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleUniSwap'
     );
   }
 
@@ -41,9 +39,7 @@ library DexScaler {
     (, startByte) = data._readUint8(startByte);
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleStableSwap'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleStableSwap'
     );
   }
 
@@ -63,9 +59,7 @@ library DexScaler {
     (, startByte) = data._readUint8(startByte);
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleCurveSwap'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleCurveSwap'
     );
   }
 
@@ -80,7 +74,7 @@ library DexScaler {
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
       startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
+      oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
       'scaleUniswapV3KSElastic'
     );
   }
@@ -96,9 +90,7 @@ library DexScaler {
     (, startByte) = data._readUint8(startByte);
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleBalancerV2'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleBalancerV2'
     );
   }
 
@@ -112,9 +104,7 @@ library DexScaler {
     (, startByte) = data._readPool(startByte);
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleDODO'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleDODO'
     );
   }
 
@@ -131,9 +121,7 @@ library DexScaler {
 
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleGMX'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleGMX'
     );
   }
 
@@ -152,9 +140,7 @@ library DexScaler {
 
     (uint256 swapAmount,) = data._readUint128AsUint256(startByte);
     return data.write16Bytes(
-      startByte,
-      oldAmount == 0 ? 0 : oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount,
-      'scaleSynthetix'
+      startByte, oldAmount == 0 ? 0 : (swapAmount * newAmount) / oldAmount, 'scaleSynthetix'
     );
   }
 

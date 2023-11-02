@@ -9,6 +9,7 @@ library BytesHelper {
     assembly {
       let offset := add(original, add(index, 32))
       let val := mload(offset) // read 32 bytes [index : index + 32]
+      val := and(val, not(0xffffffffffffffffffffffffffffffff00000000000000000000000000000000)) // clear [index : index + 16]
       val := or(val, value) // set 16 bytes to val above
       mstore(offset, val) // store to [index : index + 32]
     }
