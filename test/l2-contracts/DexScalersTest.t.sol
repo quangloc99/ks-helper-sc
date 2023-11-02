@@ -50,11 +50,8 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.collectAmount,
-      (swap.collectAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
+    assertEq(
+      swapScaled.collectAmount, (swap.collectAmount * newAmount) / oldAmount, 'results are not eq'
     );
   }
 
@@ -71,9 +68,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.dx, (swap.dx * newAmount) / oldAmount, oldAmount, 'results are not approx eq'
-    );
+    assertEq(swapScaled.dx, (swap.dx * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleCurveSwap(uint128 oldAmount, uint128 newAmount, bool canGetIndex) public {
@@ -89,9 +84,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.dx, (swap.dx * newAmount) / oldAmount, oldAmount, 'results are not approx eq'
-    );
+    assertEq(swapScaled.dx, (swap.dx * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleUniswapV3KSElastic(
@@ -112,12 +105,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.swapAmount,
-      (swap.swapAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.swapAmount, (swap.swapAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleBalancerV2(uint128 oldAmount, uint128 newAmount) public {
@@ -133,12 +121,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleDODO(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -154,12 +137,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleGMX(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -175,12 +153,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleSynthetix(uint128 oldAmount, uint128 newAmount) public {
@@ -196,11 +169,8 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.sourceAmount,
-      (swap.sourceAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
+    assertEq(
+      swapScaled.sourceAmount, (swap.sourceAmount * newAmount) / oldAmount, 'results are not eq'
     );
   }
 
@@ -217,12 +187,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scalePlatypus(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -239,11 +204,8 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.collectAmount,
-      (swap.collectAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
+    assertEq(
+      swapScaled.collectAmount, (swap.collectAmount * newAmount) / oldAmount, 'results are not eq'
     );
   }
 
@@ -260,12 +222,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amountIn,
-      (swap.amountIn * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amountIn, (swap.amountIn * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleMaverick(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -282,12 +239,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.swapAmount,
-      (swap.swapAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.swapAmount, (swap.swapAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleSyncSwap(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -303,11 +255,8 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.collectAmount,
-      (swap.collectAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
+    assertEq(
+      swapScaled.collectAmount, (swap.collectAmount * newAmount) / oldAmount, 'results are not eq'
     );
   }
 
@@ -325,12 +274,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.swapAmount,
-      (swap.swapAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.swapAmount, (swap.swapAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleBalancerBatch(
@@ -351,12 +295,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amountIn,
-      (swap.amountIn * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amountIn, (swap.amountIn * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleMantis(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -373,12 +312,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleIziSwap(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -395,12 +329,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.swapAmount,
-      (swap.swapAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.swapAmount, (swap.swapAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleTraderJoeV2(
@@ -422,11 +351,10 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
+    assertEq(
       swapScaled.collectAmount & ~uint256(1 << 255),
       ((swap.collectAmount & ~uint256(1 << 255)) * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
+      'results are not eq'
     );
   }
 
@@ -445,12 +373,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amountIn,
-      (swap.amountIn * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amountIn, (swap.amountIn * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleGMXGLP(
@@ -473,12 +396,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.swapAmount,
-      (swap.swapAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.swapAmount, (swap.swapAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleVooi(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -495,12 +413,7 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.fromAmount,
-      (swap.fromAmount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.fromAmount, (swap.fromAmount * newAmount) / oldAmount, 'results are not eq');
   }
 
   function test_scaleVelocoreV2(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
@@ -518,11 +431,6 @@ contract DexScalersTest is Test {
     );
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
-    assertApproxEqAbs(
-      swapScaled.amount,
-      (swap.amount * newAmount) / oldAmount,
-      oldAmount,
-      'results are not approx eq'
-    );
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
 }
