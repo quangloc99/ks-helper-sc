@@ -13,7 +13,7 @@ interface IExecutorHelperL2 {
     uint256 minTotalAmountOut;
     address to;
     uint256 deadline;
-    bytes destTokenFeeData;
+    bytes positiveSlippageData;
   }
 
   struct UniSwap {

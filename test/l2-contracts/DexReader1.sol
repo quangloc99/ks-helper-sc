@@ -10,7 +10,7 @@ import 'src/interfaces/IExecutorHelperL2.sol';
 contract DexReader1 is Common {
   function readUniSwap(
     bytes memory data,
-    address, /* tokenIn */
+    address tokenIn,
     bool isFirstDex,
     address nextPool,
     bool getPoolOnly

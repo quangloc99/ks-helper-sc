@@ -70,7 +70,7 @@ contract CalldataReader {
   function _readUint128AsUint256(
     bytes memory data,
     uint256 startByte
-  ) internal pure returns (uint256, uint256) {
+  ) public pure returns (uint256, uint256) {
     bytes memory ret;
     (ret, startByte) = _calldataVal(data, startByte, 16);
     return (uint256(uint128(bytes16(ret))), startByte);
