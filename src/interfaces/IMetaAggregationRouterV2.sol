@@ -28,6 +28,14 @@ interface IMetaAggregationRouterV2 {
     bytes clientData;
   }
 
+  struct SimpleSwapData {
+    address[] firstPools;
+    uint256[] firstSwapAmounts;
+    bytes[] swapDatas;
+    uint256 deadline;
+    bytes positiveSlippageData;
+  }
+
   function swap(SwapExecutionParams calldata execution) external payable returns (uint256, uint256);
 
   function swapSimpleMode(

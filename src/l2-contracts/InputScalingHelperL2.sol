@@ -2,11 +2,13 @@
 pragma solidity 0.8.9;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {IExecutorHelperL2} from '../interfaces/IExecutorHelperL2.sol';
+import {IAggregationExecutorOptimistic as IExecutorHelperL2} from
+  '../interfaces/IAggregationExecutorOptimistic.sol';
+import {IExecutorHelper as IExecutorHelperL1} from '../interfaces/IExecutorHelper.sol';
 import {IMetaAggregationRouterV2} from '../interfaces/IMetaAggregationRouterV2.sol';
 import {ScalingDataL2Lib} from './ScalingDataL2Lib.sol';
 import {ExecutorReader} from './ExecutorReader.sol';
-import {console} from 'forge-std/console.sol';
+import {CalldataWriter} from './CalldataWriter.sol';
 
 contract InputScalingHelperL2 {
   using ExecutorReader for bytes;
@@ -19,32 +21,9 @@ contract InputScalingHelperL2 {
   uint256 private constant _BURN_FROM_TX_ORIGIN = 0x10;
   uint256 private constant _SIMPLE_SWAP = 0x20;
 
-  // fee data in case taking in dest token
   struct PositiveSlippageFeeData {
-    uint256 partnerPSInfor; // [partnerReceiver (160 bit) + partnerPercent(96bits)]
+    uint256 partnerPSInfor;
     uint256 expectedReturnAmount;
-  }
-
-  struct Swap {
-    bytes data;
-    bytes4 functionSelector;
-  }
-
-  struct SimpleSwapData {
-    address[] firstPools;
-    uint256[] firstSwapAmounts;
-    bytes[] swapDatas;
-    uint256 deadline;
-    bytes positiveSlippageData;
-  }
-
-  struct SwapExecutorDescription {
-    Swap[][] swapSequences;
-    address tokenIn;
-    address tokenOut;
-    address to;
-    uint256 deadline;
-    bytes positiveSlippageData;
   }
 
   enum DexIndex {
@@ -122,7 +101,7 @@ contract InputScalingHelperL2 {
     bytes memory executorData,
     uint256 newAmount,
     bool isSimpleMode
-  ) internal view returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory, bytes memory) {
+  ) internal pure returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory, bytes memory) {
     uint256 oldAmount = desc.amount;
     if (oldAmount == newAmount) {
       return (desc, executorData);
@@ -139,7 +118,7 @@ contract InputScalingHelperL2 {
     //normal mode swap
     return (
       _scaledSwapDescriptionV2(desc, oldAmount, newAmount),
-      _scaledExecutorCallBytesData(executorData, oldAmount, newAmount) // @note change this logic
+      _scaledExecutorCallBytesData(executorData, oldAmount, newAmount)
     );
   }
 
@@ -151,7 +130,7 @@ contract InputScalingHelperL2 {
   ) internal pure returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory) {
     desc.minReturnAmount = (desc.minReturnAmount * newAmount) / oldAmount;
     if (desc.minReturnAmount == 0) desc.minReturnAmount = 1;
-    desc.amount = newAmount;
+    desc.amount = desc.amount * newAmount / oldAmount;
 
     uint256 nReceivers = desc.srcReceivers.length;
     for (uint256 i = 0; i < nReceivers;) {
@@ -169,18 +148,36 @@ contract InputScalingHelperL2 {
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
-    SimpleSwapData memory swapData = abi.decode(data, (SimpleSwapData));
+    IMetaAggregationRouterV2.SimpleSwapData memory simpleSwapData =
+      abi.decode(data, (IMetaAggregationRouterV2.SimpleSwapData));
+    uint256 nPools = simpleSwapData.firstPools.length;
+    address tokenIn;
 
-    uint256 nPools = swapData.firstPools.length;
     for (uint256 i = 0; i < nPools;) {
-      swapData.firstSwapAmounts[i] = (swapData.firstSwapAmounts[i] * newAmount) / oldAmount;
+      simpleSwapData.firstSwapAmounts[i] =
+        (simpleSwapData.firstSwapAmounts[i] * newAmount) / oldAmount;
+
+      IExecutorHelperL2.Swap[] memory dexData;
+
+      (dexData, tokenIn) = simpleSwapData.swapDatas[i].readSwapSingleSequence();
+
+      // only need to scale the first dex in each sequence
+      if (dexData.length > 0) {
+        dexData[0] = _scaleDexData(dexData[0], oldAmount, newAmount);
+      }
+
+      simpleSwapData.swapDatas[i] =
+        CalldataWriter._writeSwapSingleSequence(abi.encode(dexData), tokenIn);
+
       unchecked {
         ++i;
       }
     }
-    swapData.positiveSlippageData =
-      _scaledPositiveSlippageFeeData(swapData.positiveSlippageData, oldAmount, newAmount);
-    return abi.encode(swapData);
+
+    simpleSwapData.positiveSlippageData =
+      _scaledPositiveSlippageFeeData(simpleSwapData.positiveSlippageData, oldAmount, newAmount);
+
+    return abi.encode(simpleSwapData);
   }
 
   /// @dev Scale the executorData in case normal swap
@@ -188,95 +185,23 @@ contract InputScalingHelperL2 {
     bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal view returns (bytes memory) {
-    SwapExecutorDescription memory executorDesc =
-      abi.decode(data.readSwapExecutorDescription(), (SwapExecutorDescription));
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperL2.SwapExecutorDescription memory executorDesc =
+      abi.decode(data.readSwapExecutorDescription(), (IExecutorHelperL2.SwapExecutorDescription));
+
     executorDesc.positiveSlippageData =
       _scaledPositiveSlippageFeeData(executorDesc.positiveSlippageData, oldAmount, newAmount);
 
     uint256 nSequences = executorDesc.swapSequences.length;
     for (uint256 i = 0; i < nSequences;) {
-      Swap memory swap = executorDesc.swapSequences[i][0];
-      uint8 functionSelectorIndex = uint8(uint32(swap.functionSelector));
-
-      if (DexIndex(functionSelectorIndex) == DexIndex.UNI) {
-        swap.data = swap.data.newUniSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.StableSwap) {
-        swap.data = swap.data.newStableSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Curve) {
-        swap.data = swap.data.newCurveSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDMM) {
-        swap.data = swap.data.newKyberDMM(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.UniswapV3KSElastic) {
-        swap.data = swap.data.newUniswapV3KSElastic(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.RFQ) {
-        revert('InputScalingHelper: Can not scale RFQ swap');
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerV2) {
-        swap.data = swap.data.newBalancerV2(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.wstETH) {
-        swap.data = swap.data.newWrappedstETHSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.stETH) {
-        swap.data = swap.data.newStETHSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.DODO) {
-        swap.data = swap.data.newDODO(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Velodrome) {
-        swap.data = swap.data.newVelodrome(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.GMX) {
-        swap.data = swap.data.newGMX(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Synthetix) {
-        swap.data = swap.data.newSynthetix(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Hashflow) {
-        revert('InputScalingHelper: Can not scale Hashflow swap');
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Camelot) {
-        swap.data = swap.data.newCamelot(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberLO) {
-        revert('InputScalingHelper: Can not scale KyberLO swap');
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.PSM) {
-        swap.data = swap.data.newPSM(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Fraxswap) {
-        swap.data = swap.data.newFrax(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Platypus) {
-        swap.data = swap.data.newPlatypus(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Maverick) {
-        swap.data = swap.data.newMaverick(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.SyncSwap) {
-        swap.data = swap.data.newSyncSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.AlgebraV1) {
-        swap.data = swap.data.newAlgebraV1(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerBatch) {
-        swap.data = swap.data.newBalancerBatch(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Mantis) {
-        swap.data = swap.data.newMantis(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Wombat) {
-        swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.iZiSwap) {
-        swap.data = swap.data.newIziSwap(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.TraderJoeV2) {
-        swap.data = swap.data.newTraderJoeV2(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.WooFiV2) {
-        swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDSLO) {
-        revert('InputScalingHelper: Can not scale KyberDSLO swap');
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.LevelFiV2) {
-        swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap) {
-        swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.GMXGLP) {
-        swap.data = swap.data.newGMXGLP(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Vooi) {
-        swap.data = swap.data.newVooi(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.VelocoreV2) {
-        swap.data = swap.data.newVelocoreV2(oldAmount, newAmount);
-      } else if (DexIndex(functionSelectorIndex) == DexIndex.Smardex) {
-        swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
-      } else {
-        revert('InputScaleHelper: Dex type not supported');
-      }
+      // only need to scale the first dex in each sequence
+      IExecutorHelperL2.Swap memory swap = executorDesc.swapSequences[i][0];
+      executorDesc.swapSequences[i][0] = _scaleDexData(swap, oldAmount, newAmount);
       unchecked {
         ++i;
       }
     }
-    return abi.encode(executorDesc);
+    return CalldataWriter.writeSwapExecutorDescription(executorDesc);
   }
 
   function _scaledPositiveSlippageFeeData(
@@ -302,7 +227,90 @@ contract InputScalingHelperL2 {
     return data;
   }
 
-  function _flagsChecked(uint256 number, uint256 flag) internal pure returns (bool) {
+  function _scaleDexData(
+    IExecutorHelperL2.Swap memory swap,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (IExecutorHelperL2.Swap memory) {
+    uint8 functionSelectorIndex = uint8(uint32(swap.functionSelector));
+
+    if (DexIndex(functionSelectorIndex) == DexIndex.UNI) {
+      swap.data = swap.data.newUniSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.StableSwap) {
+      swap.data = swap.data.newStableSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Curve) {
+      swap.data = swap.data.newCurveSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDMM) {
+      swap.data = swap.data.newKyberDMM(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.UniswapV3KSElastic) {
+      swap.data = swap.data.newUniswapV3KSElastic(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.RFQ) {
+      revert('InputScalingHelper: Can not scale RFQ swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerV2) {
+      swap.data = swap.data.newBalancerV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.wstETH) {
+      swap.data = swap.data.newWrappedstETHSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.stETH) {
+      swap.data = swap.data.newStETHSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.DODO) {
+      swap.data = swap.data.newDODO(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Velodrome) {
+      swap.data = swap.data.newVelodrome(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.GMX) {
+      swap.data = swap.data.newGMX(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Synthetix) {
+      swap.data = swap.data.newSynthetix(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Hashflow) {
+      revert('InputScalingHelper: Can not scale Hashflow swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Camelot) {
+      swap.data = swap.data.newCamelot(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberLO) {
+      revert('InputScalingHelper: Can not scale KyberLO swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.PSM) {
+      swap.data = swap.data.newPSM(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Fraxswap) {
+      swap.data = swap.data.newFrax(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Platypus) {
+      swap.data = swap.data.newPlatypus(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Maverick) {
+      swap.data = swap.data.newMaverick(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.SyncSwap) {
+      swap.data = swap.data.newSyncSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.AlgebraV1) {
+      swap.data = swap.data.newAlgebraV1(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerBatch) {
+      swap.data = swap.data.newBalancerBatch(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Mantis) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Wombat) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.iZiSwap) {
+      swap.data = swap.data.newIziSwap(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.TraderJoeV2) {
+      swap.data = swap.data.newTraderJoeV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.WooFiV2) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDSLO) {
+      revert('InputScalingHelper: Can not scale KyberDSLO swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.LevelFiV2) {
+      swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap) {
+      swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.GMXGLP) {
+      swap.data = swap.data.newGMXGLP(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Vooi) {
+      swap.data = swap.data.newVooi(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.VelocoreV2) {
+      swap.data = swap.data.newVelocoreV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Smardex) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else {
+      revert('InputScaleHelper: Dex type not supported');
+    }
+    return swap;
+  }
+
+  function _flagsChecked(uint256 number, uint256 flag) internal view returns (bool) {
     return number & flag != 0;
   }
 }

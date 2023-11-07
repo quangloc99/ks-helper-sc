@@ -4,7 +4,7 @@ pragma solidity 0.8.9;
 interface IExecutorHelper {
   struct Swap {
     bytes data;
-    bytes4 functionSelector;
+    bytes32 selectorAndFlags; // [selector (32 bits) + flags (224 bits)]; selector is 4 most significant bytes; flags are stored in 4 least significant bytes.
   }
 
   struct SwapExecutorDescription {
@@ -14,7 +14,7 @@ interface IExecutorHelper {
     uint256 minTotalAmountOut;
     address to;
     uint256 deadline;
-    bytes destTokenFeeData;
+    bytes positiveSlippageData;
   }
 
   struct UniSwap {
