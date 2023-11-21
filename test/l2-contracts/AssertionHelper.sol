@@ -167,6 +167,7 @@ contract AssertionHelper is Test {
         || dexType == InputScalingHelperL2.DexIndex.Wombat
         || dexType == InputScalingHelperL2.DexIndex.WooFiV2
         || dexType == InputScalingHelperL2.DexIndex.Smardex
+        || dexType == InputScalingHelperL2.DexIndex.SolidlyV2
     ) {
       fn = assertMantisData;
     } else if (dexType == InputScalingHelperL2.DexIndex.iZiSwap) {
@@ -181,6 +182,8 @@ contract AssertionHelper is Test {
       fn = assertVooiData;
     } else if (dexType == InputScalingHelperL2.DexIndex.VelocoreV2) {
       fn = assertVelocoreV2Data;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Kokonut) {
+      fn = assertKokonutData;
     } else {
       fn = assertNothing;
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
@@ -505,6 +508,19 @@ contract AssertionHelper is Test {
     IExecutorHelperL2.VelocoreV2 memory data = abi.decode(depacked, (IExecutorHelperL2.VelocoreV2));
 
     assertEq(data.amount, mockParams.amount * newAmount / oldAmount);
+  }
+
+  function assertKokonutData(bytes memory dexData, uint256 newAmount, uint256 oldAmount) internal {
+    bytes memory depacked = reader.readKokonut({
+      data: dexData,
+      tokenIn: mockParams.srcToken,
+      isFirstDex: true,
+      nextPool: MOCK_ADDRESS,
+      getPoolOnly: false
+    });
+    IExecutorHelperL2.Kokonut memory data = abi.decode(depacked, (IExecutorHelperL2.Kokonut));
+
+    assertEq(data.dx, mockParams.amount * newAmount / oldAmount);
   }
 
   function excludeSighash(bytes calldata rawData) external returns (bytes memory) {

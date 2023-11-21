@@ -224,6 +224,14 @@ interface IExecutorHelper {
     address recipient; // empty if migrate
   }
 
+  struct Kokonut {
+    address pool;
+    uint256 dx;
+    uint256 tokenIndexFrom;
+    address fromToken;
+    address toToken;
+  }
+
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -395,6 +403,16 @@ interface IExecutorHelper {
   ) external payable returns (uint256);
 
   function executeSmardex(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeSolidlyV2(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeKokonut(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

@@ -290,4 +290,14 @@ library ScalingDataLib {
     maticMigrate.amount = (maticMigrate.amount * newAmount) / oldAmount;
     return abi.encode(maticMigrate);
   }
+
+  function newKokonut(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Kokonut memory kokonut = abi.decode(data, (IExecutorHelper.Kokonut));
+    kokonut.dx = (kokonut.dx * newAmount) / oldAmount;
+    return abi.encode(kokonut);
+  }
 }

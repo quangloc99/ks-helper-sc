@@ -135,6 +135,7 @@ contract TestDataWriter is AssertionHelper {
         || dexType == InputScalingHelperL2.DexIndex.Wombat
         || dexType == InputScalingHelperL2.DexIndex.WooFiV2
         || dexType == InputScalingHelperL2.DexIndex.Smardex
+        || dexType == InputScalingHelperL2.DexIndex.SolidlyV2
     ) {
       fn = _createMantis;
     } else if (dexType == InputScalingHelperL2.DexIndex.iZiSwap) {
@@ -149,6 +150,8 @@ contract TestDataWriter is AssertionHelper {
       fn = _createVooi;
     } else if (dexType == InputScalingHelperL2.DexIndex.VelocoreV2) {
       fn = _createVelocoreV2;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Kokonut) {
+      fn = _createKokonut;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -390,6 +393,17 @@ contract TestDataWriter is AssertionHelper {
     IExecutorHelperL2.VelocoreV2 memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeVelocoreV2({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
+  }
+
+  function _createKokonut(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+    IExecutorHelperL2.Kokonut memory data;
+    data.dx = mockParams.amount;
+    swap.data = writer.writeKokonut({
       swap: data,
       poolIndex: 0,
       sequenceIndex: sequenceIndex,

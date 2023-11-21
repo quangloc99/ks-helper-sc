@@ -222,4 +222,12 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleVelocoreV2(oldAmount, newAmount);
   }
+
+  function newKokonut(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleKokonut(oldAmount, newAmount);
+  }
 }
