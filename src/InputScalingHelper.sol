@@ -15,7 +15,7 @@ import {ScalingDataLib} from './ScalingDataLib.sol';
 |__| \__|  \______/      |__|     |_______|
 
 
-Please use InputScalingHelperL2 contract for scaling data on Arbitrum, Optimism
+Please use InputScalingHelperL2 contract for scaling data on Arbitrum, Optimism, Base
 
 ---------------------------------------- */
 
@@ -238,6 +238,10 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newMaticMigrate(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeSmardex.selector) {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Smardex and Mantis have same fields
+      } else if (functionSelector == IExecutorHelper.executeSolidlyV2.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Solidly V2 and Mantis have same fields
+      } else if (functionSelector == IExecutorHelper.executeKokonut.selector) {
+        swap.data = ScalingDataLib.newKokonut(swap.data, oldAmount, newAmount);
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }

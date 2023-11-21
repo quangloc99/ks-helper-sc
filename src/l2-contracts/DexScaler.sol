@@ -419,4 +419,19 @@ library DexScaler {
       startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleVelocoreV2'
     );
   }
+
+  function scaleKokonut(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleKokonut'
+    );
+  }
 }

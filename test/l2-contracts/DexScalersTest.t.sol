@@ -433,4 +433,21 @@ contract DexScalersTest is Test {
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
+
+  function test_scaleKokonut(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2.Kokonut memory swap;
+    swap.dx = oldAmount;
+
+    bytes memory compressed = writer.writeKokonut(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newKokonut(oldAmount, newAmount);
+
+    IExecutorHelperL2.Kokonut memory swapScaled = abi.decode(
+      reader.readKokonut(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2.Kokonut)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.dx, (swap.dx * newAmount) / oldAmount, 'results are not eq');
+  }
 }

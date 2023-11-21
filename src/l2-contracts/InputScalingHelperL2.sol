@@ -61,7 +61,9 @@ contract InputScalingHelperL2 {
     PancakeStableSwap,
     Vooi,
     VelocoreV2,
-    Smardex
+    Smardex,
+    SolidlyV2,
+    Kokonut
   }
 
   function getScaledInputData(
@@ -304,6 +306,10 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newVelocoreV2(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Smardex) {
       swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.SolidlyV2) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Kokonut) {
+      swap.data = swap.data.newKokonut(oldAmount, newAmount);
     } else {
       revert('InputScaleHelper: Dex type not supported');
     }

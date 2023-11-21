@@ -216,4 +216,29 @@ contract DexReader4 is Common {
     }
     return abi.encode(swap);
   }
+
+  function readKokonut(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.Kokonut memory swap;
+    // decode
+    (swap.pool, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    swap.fromToken = tokenIn;
+
+    if (isFirstDex) {
+      (swap.dx, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.dx = collect ? type(uint256).max : 0;
+    }
+    return abi.encode(swap);
+  }
 }
