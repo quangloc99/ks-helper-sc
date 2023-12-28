@@ -262,6 +262,23 @@ interface IExecutorHelperL2 {
     address tokenOut;
   }
 
+  struct SwaapV2 {
+    address router;
+    uint256 amount;
+    bytes data;
+    address tokenIn;
+    address tokenOut;
+    address recipient;
+  }
+
+  struct ArbswapStable {
+    address pool;
+    uint256 dx;
+    uint256 tokenIndexFrom;
+    address tokenIn;
+    address tokenOut;
+  }
+
   function executeUniswap(
     uint256 index,
     bytes memory data,
@@ -569,6 +586,33 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeBalancerV1(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeSwaapV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeNomiswapStable(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeArbswapStable(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

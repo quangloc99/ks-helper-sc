@@ -242,6 +242,23 @@ interface IExecutorHelper {
     uint256 amount;
   }
 
+  struct SwaapV2 {
+    address router;
+    uint256 amount;
+    bytes data;
+    address tokenIn;
+    address tokenOut;
+    address recipient;
+  }
+
+  struct ArbswapStable {
+    address pool;
+    uint256 dx;
+    uint256 tokenIndexFrom;
+    address tokenIn;
+    address tokenOut;
+  }
+
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -428,6 +445,21 @@ interface IExecutorHelper {
   ) external payable returns (uint256);
 
   function executeBalancerV1(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeSwaapV2(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeNomiswapStable(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeArbswapStable(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

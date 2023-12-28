@@ -64,7 +64,10 @@ contract InputScalingHelperL2 {
     Smardex,
     SolidlyV2,
     Kokonut,
-    BalancerV1
+    BalancerV1,
+    SwaapV2,
+    NomiswapStable,
+    ArbswapStable
   }
 
   function getScaledInputData(
@@ -313,6 +316,12 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newKokonut(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerV1) {
       swap.data = swap.data.newBalancerV1(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.SwaapV2) {
+      revert('InputScalingHelper: Can not scale SwaapV2 swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.NomiswapStable) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.ArbswapStable) {
+      swap.data = swap.data.newArbswapStable(oldAmount, newAmount);
     } else {
       revert('InputScaleHelper: Dex type not supported');
     }

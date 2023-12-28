@@ -310,4 +310,15 @@ library ScalingDataLib {
     balancerV1.amount = (balancerV1.amount * newAmount) / oldAmount;
     return abi.encode(balancerV1);
   }
+
+  function newArbswapStable(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.ArbswapStable memory arbswapStable =
+      abi.decode(data, (IExecutorHelper.ArbswapStable));
+    arbswapStable.dx = (arbswapStable.dx * newAmount) / oldAmount;
+    return abi.encode(arbswapStable);
+  }
 }
