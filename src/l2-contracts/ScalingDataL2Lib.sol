@@ -238,4 +238,12 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleBalancerV1(oldAmount, newAmount);
   }
+
+  function newArbswapStable(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleArbswapStable(oldAmount, newAmount);
+  }
 }

@@ -244,6 +244,12 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newKokonut(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeBalancerV1.selector) {
         swap.data = ScalingDataLib.newBalancerV1(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeSwaapV2.selector) {
+        revert('InputScalingHelper: Can not scale SwaapV2 swap');
+      } else if (functionSelector == IExecutorHelper.executeNomiswapStable.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because NomiswapV2 and Mantis have same fields
+      } else if (functionSelector == IExecutorHelper.executeArbswapStable.selector) {
+        swap.data = ScalingDataLib.newArbswapStable(swap.data, oldAmount, newAmount);
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }
