@@ -250,6 +250,10 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because NomiswapV2 and Mantis have same fields
       } else if (functionSelector == IExecutorHelper.executeArbswapStable.selector) {
         swap.data = ScalingDataLib.newArbswapStable(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeBancorV2.selector) {
+        swap.data = ScalingDataLib.newBancorV2(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeBancorV3.selector) {
+        swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Bancor V3 and Mantis have same fields
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }

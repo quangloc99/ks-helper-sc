@@ -279,6 +279,13 @@ interface IExecutorHelperL2 {
     address tokenOut;
   }
 
+  struct BancorV2 {
+    address pool;
+    address[] swapPath;
+    uint256 amount;
+    address recipient;
+  }
+
   function executeUniswap(
     uint256 index,
     bytes memory data,
@@ -613,6 +620,24 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeArbswapStable(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeBancorV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeBancorV3(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,
