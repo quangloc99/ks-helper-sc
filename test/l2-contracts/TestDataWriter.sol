@@ -137,6 +137,7 @@ contract TestDataWriter is AssertionHelper {
         || dexType == InputScalingHelperL2.DexIndex.Smardex
         || dexType == InputScalingHelperL2.DexIndex.SolidlyV2
         || dexType == InputScalingHelperL2.DexIndex.NomiswapStable
+        || dexType == InputScalingHelperL2.DexIndex.BancorV3
     ) {
       fn = _createMantis;
     } else if (dexType == InputScalingHelperL2.DexIndex.iZiSwap) {
@@ -157,6 +158,8 @@ contract TestDataWriter is AssertionHelper {
       fn = _createBalancerV1;
     } else if (dexType == InputScalingHelperL2.DexIndex.ArbswapStable) {
       fn = _createArbswapStable;
+    } else if (dexType == InputScalingHelperL2.DexIndex.BancorV2) {
+      fn = _createBancorV2;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -434,6 +437,17 @@ contract TestDataWriter is AssertionHelper {
     IExecutorHelperL2.ArbswapStable memory data;
     data.dx = mockParams.amount;
     swap.data = writer.writeArbswapStable({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
+  }
+
+  function _createBancorV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+    IExecutorHelperL2.BancorV2 memory data;
+    data.amount = mockParams.amount;
+    swap.data = writer.writeBancorV2({
       swap: data,
       poolIndex: 0,
       sequenceIndex: sequenceIndex,

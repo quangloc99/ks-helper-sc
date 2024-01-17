@@ -465,4 +465,22 @@ library DexScaler {
       startByte, oldAmount == 0 ? 0 : (dx * newAmount) / oldAmount, 'scaleArbswapStable'
     );
   }
+
+  function scaleBancorV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (, startByte) = data._readAddressArray(startByte); // swapPath
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleBancorV2'
+    );
+  }
 }

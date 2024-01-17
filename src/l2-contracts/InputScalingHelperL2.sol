@@ -67,7 +67,9 @@ contract InputScalingHelperL2 {
     BalancerV1,
     SwaapV2,
     NomiswapStable,
-    ArbswapStable
+    ArbswapStable,
+    BancorV2,
+    BancorV3
   }
 
   function getScaledInputData(
@@ -322,6 +324,10 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else if (DexIndex(functionSelectorIndex) == DexIndex.ArbswapStable) {
       swap.data = swap.data.newArbswapStable(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.BancorV2) {
+      swap.data = swap.data.newBancorV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.BancorV3) {
+      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else {
       revert('InputScaleHelper: Dex type not supported');
     }

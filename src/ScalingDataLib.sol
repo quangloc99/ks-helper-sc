@@ -321,4 +321,14 @@ library ScalingDataLib {
     arbswapStable.dx = (arbswapStable.dx * newAmount) / oldAmount;
     return abi.encode(arbswapStable);
   }
+
+  function newBancorV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.BancorV2 memory bancorV2 = abi.decode(data, (IExecutorHelper.BancorV2));
+    bancorV2.amount = (bancorV2.amount * newAmount) / oldAmount;
+    return abi.encode(bancorV2);
+  }
 }
