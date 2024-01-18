@@ -254,6 +254,8 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newBancorV2(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeBancorV3.selector) {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Bancor V3 and Mantis have same fields
+      } else if (functionSelector == IExecutorHelper.executeAmbient.selector) {
+        swap.data = ScalingDataLib.newAmbient(swap.data, oldAmount, newAmount);
       } else {
         revert('AggregationExecutor: Dex type not supported');
       }

@@ -542,6 +542,23 @@ contract DexWriter {
     }
   }
 
+  function writeAmbient(
+    IExecutorHelperL2.Ambient memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.pool));
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.qty)));
+    else shortData = bytes.concat(shortData, bytes1(swap.qty > 0 ? 1 : 0));
+
+    shortData = bytes.concat(shortData, bytes20(swap.base));
+    shortData = bytes.concat(shortData, bytes20(swap.quote));
+    shortData = bytes.concat(shortData, bytes16(uint128(swap.poolIdx)));
+    shortData = bytes.concat(shortData, bytes1(swap.settleFlags));
+  }
+
   /*
    ************************ Utility ************************
    */

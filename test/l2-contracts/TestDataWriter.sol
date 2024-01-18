@@ -160,6 +160,8 @@ contract TestDataWriter is AssertionHelper {
       fn = _createArbswapStable;
     } else if (dexType == InputScalingHelperL2.DexIndex.BancorV2) {
       fn = _createBancorV2;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Ambient) {
+      fn = _createAmbient;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -453,5 +455,11 @@ contract TestDataWriter is AssertionHelper {
       sequenceIndex: sequenceIndex,
       recipientFlag: mockParams.recipientFlag
     });
+  }
+
+  function _createAmbient(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+    IExecutorHelperL2.Ambient memory data;
+    data.qty = uint128(mockParams.amount);
+    swap.data = writer.writeAmbient({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 }

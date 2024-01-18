@@ -299,6 +299,38 @@ contract DexReader3 is Common {
     return abi.encode(swap);
   }
 
+  function readAmbient(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.Ambient memory swap;
+    // decode
+    (swap.pool, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    if (isFirstDex) {
+      (swap.qty, startByte) = _readUint128(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.qty = collect ? type(uint128).max : 0;
+    }
+
+    swap.base = tokenIn;
+
+    (swap.quote, startByte) = _readAddress(data, startByte);
+
+    (swap.poolIdx, startByte) = _readUint128AsUint256(data, startByte);
+
+    (swap.settleFlags, startByte) = _readUint8(data, startByte);
+
+    return abi.encode(swap);
+  }
+
   function _readBytes32Array(
     bytes memory data,
     uint256 startByte
