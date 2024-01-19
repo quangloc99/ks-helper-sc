@@ -331,4 +331,14 @@ library ScalingDataLib {
     bancorV2.amount = (bancorV2.amount * newAmount) / oldAmount;
     return abi.encode(bancorV2);
   }
+
+  function newAmbient(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Ambient memory ambient = abi.decode(data, (IExecutorHelper.Ambient));
+    ambient.qty = uint128((uint256(ambient.qty) * newAmount) / oldAmount);
+    return abi.encode(ambient);
+  }
 }

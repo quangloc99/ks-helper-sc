@@ -266,6 +266,15 @@ interface IExecutorHelper {
     address recipient;
   }
 
+  struct Ambient {
+    address pool;
+    uint128 qty;
+    address base;
+    address quote;
+    uint256 poolIdx;
+    uint8 settleFlags;
+  }
+
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -477,6 +486,11 @@ interface IExecutorHelper {
   ) external payable returns (uint256);
 
   function executeBancorV3(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeAmbient(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

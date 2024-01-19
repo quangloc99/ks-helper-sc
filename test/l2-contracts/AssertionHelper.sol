@@ -168,6 +168,7 @@ contract AssertionHelper is Test {
         || dexType == InputScalingHelperL2.DexIndex.WooFiV2
         || dexType == InputScalingHelperL2.DexIndex.Smardex
         || dexType == InputScalingHelperL2.DexIndex.SolidlyV2
+        || dexType == InputScalingHelperL2.DexIndex.BancorV3
     ) {
       fn = assertMantisData;
     } else if (dexType == InputScalingHelperL2.DexIndex.iZiSwap) {
@@ -186,6 +187,10 @@ contract AssertionHelper is Test {
       fn = assertKokonutData;
     } else if (dexType == InputScalingHelperL2.DexIndex.BalancerV1) {
       fn = assertBalancerV1Data;
+    } else if (dexType == InputScalingHelperL2.DexIndex.BancorV2) {
+      fn = assertBancorV2;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Ambient) {
+      fn = assertAmbient;
     } else {
       fn = assertNothing;
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
@@ -540,6 +545,32 @@ contract AssertionHelper is Test {
     IExecutorHelperL2.BalancerV1 memory data = abi.decode(depacked, (IExecutorHelperL2.BalancerV1));
 
     assertEq(data.amount, mockParams.amount * newAmount / oldAmount);
+  }
+
+  function assertBancorV2(bytes memory dexData, uint256 newAmount, uint256 oldAmount) internal {
+    bytes memory depacked = reader.readBancorV2({
+      data: dexData,
+      tokenIn: mockParams.srcToken,
+      isFirstDex: true,
+      nextPool: MOCK_ADDRESS,
+      getPoolOnly: false
+    });
+    IExecutorHelperL2.BancorV2 memory data = abi.decode(depacked, (IExecutorHelperL2.BancorV2));
+
+    assertEq(data.amount, mockParams.amount * newAmount / oldAmount);
+  }
+
+  function assertAmbient(bytes memory dexData, uint256 newAmount, uint256 oldAmount) internal {
+    bytes memory depacked = reader.readAmbient({
+      data: dexData,
+      tokenIn: mockParams.srcToken,
+      isFirstDex: true,
+      nextPool: MOCK_ADDRESS,
+      getPoolOnly: false
+    });
+    IExecutorHelperL2.Ambient memory data = abi.decode(depacked, (IExecutorHelperL2.Ambient));
+
+    assertEq(data.qty, mockParams.amount * newAmount / oldAmount);
   }
 
   function excludeSighash(bytes calldata rawData) external returns (bytes memory) {

@@ -505,4 +505,24 @@ contract DexScalersTest is Test {
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
   }
+
+  function test_scaleAmbient(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+
+    IExecutorHelperL2.Ambient memory swap;
+    swap.qty = oldAmount;
+
+    bytes memory compressed = writer.writeAmbient(swap, 1, 0);
+    bytes memory scaled = compressed.newAmbient(oldAmount, newAmount);
+
+    IExecutorHelperL2.Ambient memory swapScaled = abi.decode(
+      reader.readAmbient(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2.Ambient)
+    );
+
+    uint256 tmpAmount = uint256(swap.qty) * uint256(newAmount); // handle phantom overflow
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.qty, tmpAmount / oldAmount, 'results are not eq');
+  }
 }
