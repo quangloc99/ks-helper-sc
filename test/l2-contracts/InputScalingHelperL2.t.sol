@@ -47,6 +47,8 @@ contract InputScalingHelperL2Test is TestDataWriter {
           && InputScalingHelperL2.DexIndex(dexType) != InputScalingHelperL2.DexIndex.Hashflow
           && InputScalingHelperL2.DexIndex(dexType) != InputScalingHelperL2.DexIndex.KyberDSLO
           && InputScalingHelperL2.DexIndex(dexType) != InputScalingHelperL2.DexIndex.SwaapV2
+          && InputScalingHelperL2.DexIndex(dexType) != InputScalingHelperL2.DexIndex.Native
+          && InputScalingHelperL2.DexIndex(dexType) != InputScalingHelperL2.DexIndex.Bebop
       );
     } else {
       vm.assume(
@@ -55,6 +57,8 @@ contract InputScalingHelperL2Test is TestDataWriter {
           || InputScalingHelperL2.DexIndex(dexType) == InputScalingHelperL2.DexIndex.Hashflow
           || InputScalingHelperL2.DexIndex(dexType) == InputScalingHelperL2.DexIndex.KyberDSLO
           || InputScalingHelperL2.DexIndex(dexType) == InputScalingHelperL2.DexIndex.SwaapV2
+          || InputScalingHelperL2.DexIndex(dexType) == InputScalingHelperL2.DexIndex.Native
+          || InputScalingHelperL2.DexIndex(dexType) == InputScalingHelperL2.DexIndex.Bebop
       );
     }
   }

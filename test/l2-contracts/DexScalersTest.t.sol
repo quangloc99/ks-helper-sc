@@ -8,10 +8,11 @@ import {DexReader1} from './DexReader1.sol';
 import {DexReader2} from './DexReader2.sol';
 import {DexReader3} from './DexReader3.sol';
 import {DexReader4} from './DexReader4.sol';
+import {DexReader6} from './DexReader6.sol';
 import {DexWriter} from './DexWriter.sol';
 import {ScalingDataL2Lib} from 'src/l2-contracts/ScalingDataL2Lib.sol';
 
-contract Reader is DexReader1, DexReader2, DexReader3, DexReader4 {}
+contract Reader is DexReader1, DexReader2, DexReader3, DexReader4, DexReader6 {}
 
 contract DexScalersTest is Test {
   using ScalingDataL2Lib for bytes;
@@ -524,5 +525,25 @@ contract DexScalersTest is Test {
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.qty, tmpAmount / oldAmount, 'results are not eq');
+  }
+
+  function test_scaleLighterV2(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+
+    IExecutorHelperL2.LighterV2 memory swap;
+    swap.amount = oldAmount;
+
+    bytes memory compressed = writer.writeLighterV2(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newLighterV2(oldAmount, newAmount);
+
+    IExecutorHelperL2.LighterV2 memory swapScaled = abi.decode(
+      reader.readLighterV2(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2.LighterV2)
+    );
+
+    uint256 tmpAmount = uint256(swap.amount) * uint256(newAmount); // handle phantom overflow
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.amount, tmpAmount / oldAmount, 'results are not eq');
   }
 }
