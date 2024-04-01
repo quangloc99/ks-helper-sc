@@ -409,9 +409,17 @@ library ScalingDataLib {
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     IExecutorHelper.RocketPool memory structData = abi.decode(data, (IExecutorHelper.RocketPool));
+
     uint128 _amount =
       uint128((uint256(uint128(structData.isDepositAndAmount)) * newAmount) / oldAmount);
-    structData.isDepositAndAmount |= uint256(_amount);
+
+    bool _isDeposit = (structData.isDepositAndAmount >> 255) == 1;
+
+    // reset and create new variable for isDeposit and amount
+    structData.isDepositAndAmount = 0;
+    structData.isDepositAndAmount |= uint256(uint128(_amount));
+    structData.isDepositAndAmount |= uint256(_isDeposit ? 1 : 0) << 255;
+
     return abi.encode(structData);
   }
 
@@ -423,7 +431,14 @@ library ScalingDataLib {
     IExecutorHelper.MakersDAI memory structData = abi.decode(data, (IExecutorHelper.MakersDAI));
     uint128 _amount =
       uint128((uint256(uint128(structData.isRedeemAndAmount)) * newAmount) / oldAmount);
-    structData.isRedeemAndAmount |= uint256(_amount);
+
+    bool _isRedeem = (structData.isRedeemAndAmount >> 255) == 1;
+
+    // reset and create new variable for isRedeem and amount
+    structData.isRedeemAndAmount = 0;
+    structData.isRedeemAndAmount |= uint256(uint128(_amount));
+    structData.isRedeemAndAmount |= uint256(_isRedeem ? 1 : 0) << 255;
+
     return abi.encode(structData);
   }
 }
