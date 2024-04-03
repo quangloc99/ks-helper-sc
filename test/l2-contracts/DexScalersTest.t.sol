@@ -546,4 +546,23 @@ contract DexScalersTest is Test {
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.amount, tmpAmount / oldAmount, 'results are not eq');
   }
+
+  function test_scaleMaiPSM(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+
+    IExecutorHelperL2.FrxETH memory swap;
+    swap.amount = oldAmount;
+
+    bytes memory compressed = writer.writeMaiPSM(swap, 1, 0);
+    bytes memory scaled = compressed.newMaiPSM(oldAmount, newAmount);
+
+    IExecutorHelperL2.FrxETH memory swapScaled = abi.decode(
+      reader.readMaiPSM(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false), (IExecutorHelperL2.FrxETH)
+    );
+
+    uint256 tmpAmount = uint256(swap.amount) * uint256(newAmount); // handle phantom overflow
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.amount, tmpAmount / oldAmount, 'results are not eq');
+  }
 }

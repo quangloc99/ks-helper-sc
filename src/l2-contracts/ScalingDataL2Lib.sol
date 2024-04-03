@@ -270,4 +270,12 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleLighterV2(oldAmount, newAmount);
   }
+
+  function newMaiPSM(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleMaiPSM(oldAmount, newAmount);
+  }
 }
