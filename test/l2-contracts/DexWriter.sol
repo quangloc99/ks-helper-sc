@@ -1,4 +1,4 @@
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 
