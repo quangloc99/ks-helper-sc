@@ -163,7 +163,9 @@ contract TestDataWriter is AssertionHelper {
     } else if (dexType == InputScalingHelperL2.DexIndex.Ambient) {
       fn = _createAmbient;
     } else if (dexType == InputScalingHelperL2.DexIndex.LighterV2) {
-      fn = _createAmbient;
+      fn = _createLighterV2;
+    } else if (dexType == InputScalingHelperL2.DexIndex.MaiPSM) {
+      fn = _createMaiPSM;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -474,5 +476,11 @@ contract TestDataWriter is AssertionHelper {
       sequenceIndex: sequenceIndex,
       recipientFlag: mockParams.recipientFlag
     });
+  }
+
+  function _createMaiPSM(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+    IExecutorHelperL2.FrxETH memory data;
+    data.amount = uint128(mockParams.amount);
+    swap.data = writer.writeMaiPSM({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 }

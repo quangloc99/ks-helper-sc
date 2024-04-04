@@ -43,4 +43,30 @@ contract DexReader6 is Common {
 
     return abi.encode(swap);
   }
+
+  function readMaiPSM(
+    bytes memory data,
+    address tokenIn,
+    bool isFirstDex,
+    address nextPool,
+    bool getPoolOnly
+  ) public view returns (bytes memory) {
+    uint256 startByte;
+    IExecutorHelperL2.FrxETH memory swap;
+    // decode
+    (swap.pool, startByte) = _readPool(data, startByte);
+    if (getPoolOnly) return abi.encode(swap);
+
+    if (isFirstDex) {
+      (swap.amount, startByte) = _readUint128AsUint256(data, startByte);
+    } else {
+      bool collect;
+      (collect, startByte) = _readBool(data, startByte);
+      swap.amount = collect ? type(uint256).max : 0;
+    }
+
+    (swap.tokenOut, startByte) = _readAddress(data, startByte);
+
+    return abi.encode(swap);
+  }
 }
