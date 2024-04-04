@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import {IExecutorHelper} from '../interfaces/IExecutorHelper.sol';
 import {DexScaler} from './DexScaler.sol';
@@ -269,5 +269,13 @@ library ScalingDataL2Lib {
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     return data.scaleLighterV2(oldAmount, newAmount);
+  }
+
+  function newMaiPSM(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleMaiPSM(oldAmount, newAmount);
   }
 }

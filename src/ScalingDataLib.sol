@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import {IExecutorHelper} from './interfaces/IExecutorHelper.sol';
 
@@ -440,5 +440,85 @@ library ScalingDataLib {
     structData.isRedeemAndAmount |= uint256(_isRedeem ? 1 : 0) << 255;
 
     return abi.encode(structData);
+  }
+
+  function newRenzo(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.Renzo memory structData = abi.decode(data, (IExecutorHelper.Renzo));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function newFrxETH(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.FrxETH memory structData = abi.decode(data, (IExecutorHelper.FrxETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function newSfrxETH(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.SfrxETH memory structData = abi.decode(data, (IExecutorHelper.SfrxETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function newSfrxETHConvertor(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.SfrxETHConvertor memory structData =
+      abi.decode(data, (IExecutorHelper.SfrxETHConvertor));
+
+    uint128 _amount =
+      uint128((uint256(uint128(structData.isDepositAndAmount)) * newAmount) / oldAmount);
+
+    bool _isDeposit = (structData.isDepositAndAmount >> 255) == 1;
+
+    // reset and create new variable for isDeposit and amount
+    structData.isDepositAndAmount = 0;
+    structData.isDepositAndAmount |= uint256(uint128(_amount));
+    structData.isDepositAndAmount |= uint256(_isDeposit ? 1 : 0) << 255;
+
+    return abi.encode(structData);
+  }
+
+  function newOriginETH(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelper.OriginETH memory structData = abi.decode(data, (IExecutorHelper.OriginETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function newMantleUsd(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 isWrapAndAmount = abi.decode(data, (uint256));
+
+    uint128 _amount = uint128((uint256(uint128(isWrapAndAmount)) * newAmount) / oldAmount);
+
+    bool _isWrap = (isWrapAndAmount >> 255) == 1;
+
+    // reset and create new variable for isWrap and amount
+    isWrapAndAmount = 0;
+    isWrapAndAmount |= uint256(uint128(_amount));
+    isWrapAndAmount |= uint256(_isWrap ? 1 : 0) << 255;
+
+    return abi.encode(isWrapAndAmount);
   }
 }

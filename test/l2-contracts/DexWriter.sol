@@ -1,4 +1,4 @@
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 
@@ -581,6 +581,20 @@ contract DexWriter {
       shortData = bytes.concat(shortData, bytes1(uint8(0)));
       shortData = bytes.concat(shortData, bytes20(swap.recipient));
     }
+  }
+
+  function writeMaiPSM(
+    IExecutorHelperL2.FrxETH memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.pool));
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
+    else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
+
+    shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
   }
 
   /*

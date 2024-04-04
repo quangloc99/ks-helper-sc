@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
@@ -52,11 +52,11 @@ contract InputScalingHelperV2 is Ownable {
 
   function batchUpdateHelpers(
     bytes4[] memory funcSelectors,
-    address[] memory executors
+    address[] memory helpers
   ) external onlyOwner {
-    require(funcSelectors.length == executors.length, 'invalid length');
+    require(funcSelectors.length == helpers.length, 'invalid length');
     for (uint256 i; i < funcSelectors.length;) {
-      helperOf[funcSelectors[i]] = executors[i];
+      helperOf[funcSelectors[i]] = helpers[i];
 
       unchecked {
         ++i;

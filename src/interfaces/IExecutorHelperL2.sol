@@ -1,4 +1,4 @@
-pragma solidity 0.8.9;
+pragma solidity ^0.8.0;
 
 interface IExecutorHelperL2 {
   struct Swap {
@@ -302,6 +302,12 @@ interface IExecutorHelperL2 {
     address tokenIn;
     address tokenOut;
     address recipient;
+  }
+
+  struct FrxETH {
+    address pool;
+    uint256 amount;
+    address tokenOut;
   }
 
   function executeUniswap(
@@ -683,6 +689,15 @@ interface IExecutorHelperL2 {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeLighterV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeMaiPSM(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

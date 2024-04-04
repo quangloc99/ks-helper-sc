@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {IAggregationExecutorOptimistic as IExecutorHelperL2} from
@@ -73,7 +73,8 @@ contract InputScalingHelperL2 {
     Ambient,
     Native,
     LighterV2,
-    Bebop
+    Bebop,
+    MaiPSM
   }
 
   function getScaledInputData(
@@ -340,6 +341,8 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newLighterV2(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Bebop) {
       revert('InputScalingHelper: Can not scale Bebop swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.MaiPSM) {
+      swap.data = swap.data.newMaiPSM(oldAmount, newAmount);
     } else {
       revert('InputScaleHelper: Dex type not supported');
     }

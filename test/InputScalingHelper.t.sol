@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.25;
 
 import 'forge-std/Test.sol';
 import 'forge-std/console.sol';
@@ -13,7 +13,7 @@ import '../src/helpers/Dexhelper01.sol';
 
 import './BaseInputScaling.t.sol';
 
-contract DexesTest is BaseInputScalingTest {
+contract DexesInputTest is BaseInputScalingTest {
   using stdJson for string;
 
   address private constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
