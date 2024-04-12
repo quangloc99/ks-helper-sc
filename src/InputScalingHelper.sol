@@ -178,8 +178,6 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newKyberDMM(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeUniV3KSElastic.selector) {
         swap.data = ScalingDataLib.newUniV3ProMM(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeRfq.selector) {
-        revert('InputScalingHelper: Can not scale RFQ swap');
       } else if (functionSelector == IExecutorHelper.executeBalV2.selector) {
         swap.data = ScalingDataLib.newBalancerV2(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeWrappedstETH.selector) {
@@ -194,12 +192,8 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newGMX(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeSynthetix.selector) {
         swap.data = ScalingDataLib.newSynthetix(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeHashflow.selector) {
-        revert('InputScalingHelper: Can not scale Hasflow swap');
       } else if (functionSelector == IExecutorHelper.executeCamelot.selector) {
         swap.data = ScalingDataLib.newCamelot(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeKyberLimitOrder.selector) {
-        revert('InputScalingHelper: Can not scale KyberLO swap');
       } else if (functionSelector == IExecutorHelper.executePSM.selector) {
         swap.data = ScalingDataLib.newPSM(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeFrax.selector) {
@@ -244,8 +238,6 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newKokonut(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeBalancerV1.selector) {
         swap.data = ScalingDataLib.newBalancerV1(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeSwaapV2.selector) {
-        revert('InputScalingHelper: Can not scale SwaapV2 swap');
       } else if (functionSelector == IExecutorHelper.executeNomiswapStable.selector) {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because NomiswapV2 and Mantis have same fields
       } else if (functionSelector == IExecutorHelper.executeArbswapStable.selector) {
@@ -256,12 +248,8 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newMantis(swap.data, oldAmount, newAmount); // @dev using Mantis struct because Bancor V3 and Mantis have same fields
       } else if (functionSelector == IExecutorHelper.executeAmbient.selector) {
         swap.data = ScalingDataLib.newAmbient(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeNative.selector) {
-        revert('InputScalingHelper: Can not scale Native swap');
       } else if (functionSelector == IExecutorHelper.executeLighterV2.selector) {
         swap.data = ScalingDataLib.newLighterV2(swap.data, oldAmount, newAmount);
-      } else if (functionSelector == IExecutorHelper.executeBebop.selector) {
-        revert('InputScalingHelper: Can not scale Bebop swap');
       } else if (functionSelector == IExecutorHelper.executeUniV1.selector) {
         swap.data = ScalingDataLib.newUniV1(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeEtherFieETH.selector) {
@@ -304,7 +292,10 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newEtherFieETH(swap.data, oldAmount, newAmount); // same etherfi eETH
       } else if (functionSelector == IExecutorHelper.executeMaiPSM.selector) {
         swap.data = ScalingDataLib.newFrxETH(swap.data, oldAmount, newAmount); // same frxeth
+      } else if (functionSelector == IExecutorHelper.executePufferFinance.selector) {
+        swap.data = ScalingDataLib.newPufferFinance(swap.data, oldAmount, newAmount);
       } else {
+        // RFQ, SwaapV2, Native, Bebop, Hashflow, KyberLO
         revert('AggregationExecutor: Dex type not supported');
       }
       unchecked {
