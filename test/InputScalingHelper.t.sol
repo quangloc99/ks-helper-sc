@@ -17,6 +17,7 @@ contract DexesInputTest is BaseInputScalingTest {
   using stdJson for string;
 
   address private constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+  uint256 DEX_NUM = 63;
 
   InputScalingHelperV2 scaleHelperV2;
   DexHelper01 helper01;
@@ -27,8 +28,7 @@ contract DexesInputTest is BaseInputScalingTest {
     scaleHelperV2 = new InputScalingHelperV2();
     helper01 = new DexHelper01();
 
-    bytes4[] memory funcSelectors = new bytes4[](48);
-
+    bytes4[] memory funcSelectors = new bytes4[](DEX_NUM);
     funcSelectors[0] = IExecutorHelper.executeUniswap.selector;
     funcSelectors[1] = IExecutorHelper.executeStableSwap.selector;
     funcSelectors[2] = IExecutorHelper.executeCurve.selector;
@@ -77,8 +77,23 @@ contract DexesInputTest is BaseInputScalingTest {
     funcSelectors[45] = IExecutorHelper.executeEthenaSusde.selector;
     funcSelectors[46] = IExecutorHelper.executeRocketPool.selector;
     funcSelectors[47] = IExecutorHelper.executeMakersDAI.selector;
+    funcSelectors[48] = IExecutorHelper.executeRenzo.selector;
+    funcSelectors[49] = IExecutorHelper.executeWBETH.selector;
+    funcSelectors[50] = IExecutorHelper.executeMantleETH.selector;
+    funcSelectors[51] = IExecutorHelper.executeFrxETH.selector;
+    funcSelectors[52] = IExecutorHelper.executeSfrxETH.selector;
+    funcSelectors[53] = IExecutorHelper.executeSfrxETHConvertor.selector;
+    funcSelectors[54] = IExecutorHelper.executeSwellETH.selector;
+    funcSelectors[55] = IExecutorHelper.executeRswETH.selector;
+    funcSelectors[56] = IExecutorHelper.executeStaderETHx.selector;
+    funcSelectors[57] = IExecutorHelper.executeOriginETH.selector;
+    funcSelectors[58] = IExecutorHelper.executePrimeETH.selector;
+    funcSelectors[59] = IExecutorHelper.executeMantleUsd.selector;
+    funcSelectors[60] = IExecutorHelper.executeBedrockUniETH.selector;
+    funcSelectors[61] = IExecutorHelper.executeMaiPSM.selector;
+    funcSelectors[62] = IExecutorHelper.executePufferFinance.selector;
 
-    address[] memory executors = new address[](48);
+    address[] memory executors = new address[](DEX_NUM);
     for (uint256 i; i < executors.length; i++) {
       executors[i] = address(helper01);
     }

@@ -3,7 +3,7 @@ pragma solidity 0.8.25;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import {IExecutorHelper} from '../interfaces/IExecutorHelper.sol';
+import {IExecutorHelperStruct} from '../interfaces/IExecutorHelperStruct.sol';
 
 import {RevertReasonParser} from '../libraries/RevertReasonParser.sol';
 
@@ -15,7 +15,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniSwap memory uniSwap = abi.decode(data, (IExecutorHelper.UniSwap));
+    IExecutorHelperStruct.UniSwap memory uniSwap = abi.decode(data, (IExecutorHelperStruct.UniSwap));
     uniSwap.collectAmount = (uniSwap.collectAmount * newAmount) / oldAmount;
     return abi.encode(uniSwap);
   }
@@ -27,7 +27,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.StableSwap memory stableSwap = abi.decode(data, (IExecutorHelper.StableSwap));
+    IExecutorHelperStruct.StableSwap memory stableSwap =
+      abi.decode(data, (IExecutorHelperStruct.StableSwap));
     stableSwap.dx = (stableSwap.dx * newAmount) / oldAmount;
     return abi.encode(stableSwap);
   }
@@ -39,7 +40,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.CurveSwap memory curveSwap = abi.decode(data, (IExecutorHelper.CurveSwap));
+    IExecutorHelperStruct.CurveSwap memory curveSwap =
+      abi.decode(data, (IExecutorHelperStruct.CurveSwap));
     curveSwap.dx = (curveSwap.dx * newAmount) / oldAmount;
     return abi.encode(curveSwap);
   }
@@ -51,7 +53,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniSwap memory kyberDMMSwap = abi.decode(data, (IExecutorHelper.UniSwap));
+    IExecutorHelperStruct.UniSwap memory kyberDMMSwap =
+      abi.decode(data, (IExecutorHelperStruct.UniSwap));
     kyberDMMSwap.collectAmount = (kyberDMMSwap.collectAmount * newAmount) / oldAmount;
     return abi.encode(kyberDMMSwap);
   }
@@ -63,8 +66,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniswapV3KSElastic memory uniSwapV3ProMM =
-      abi.decode(data, (IExecutorHelper.UniswapV3KSElastic));
+    IExecutorHelperStruct.UniswapV3KSElastic memory uniSwapV3ProMM =
+      abi.decode(data, (IExecutorHelperStruct.UniswapV3KSElastic));
     uniSwapV3ProMM.swapAmount = (uniSwapV3ProMM.swapAmount * newAmount) / oldAmount;
 
     return abi.encode(uniSwapV3ProMM);
@@ -77,7 +80,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.BalancerV2 memory balancerV2 = abi.decode(data, (IExecutorHelper.BalancerV2));
+    IExecutorHelperStruct.BalancerV2 memory balancerV2 =
+      abi.decode(data, (IExecutorHelperStruct.BalancerV2));
     balancerV2.amount = (balancerV2.amount * newAmount) / oldAmount;
     return abi.encode(balancerV2);
   }
@@ -89,7 +93,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.DODO memory dodo = abi.decode(data, (IExecutorHelper.DODO));
+    IExecutorHelperStruct.DODO memory dodo = abi.decode(data, (IExecutorHelperStruct.DODO));
     dodo.amount = (dodo.amount * newAmount) / oldAmount;
     return abi.encode(dodo);
   }
@@ -101,7 +105,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniSwap memory velodrome = abi.decode(data, (IExecutorHelper.UniSwap));
+    IExecutorHelperStruct.UniSwap memory velodrome =
+      abi.decode(data, (IExecutorHelperStruct.UniSwap));
     velodrome.collectAmount = (velodrome.collectAmount * newAmount) / oldAmount;
     return abi.encode(velodrome);
   }
@@ -110,7 +115,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.GMX memory gmx = abi.decode(data, (IExecutorHelper.GMX));
+    IExecutorHelperStruct.GMX memory gmx = abi.decode(data, (IExecutorHelperStruct.GMX));
     gmx.amount = (gmx.amount * newAmount) / oldAmount;
     return abi.encode(gmx);
   }
@@ -122,7 +127,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Synthetix memory synthetix = abi.decode(data, (IExecutorHelper.Synthetix));
+    IExecutorHelperStruct.Synthetix memory synthetix =
+      abi.decode(data, (IExecutorHelperStruct.Synthetix));
     synthetix.sourceAmount = (synthetix.sourceAmount * newAmount) / oldAmount;
     return abi.encode(synthetix);
   }
@@ -134,7 +140,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniSwap memory camelot = abi.decode(data, (IExecutorHelper.UniSwap));
+    IExecutorHelperStruct.UniSwap memory camelot = abi.decode(data, (IExecutorHelperStruct.UniSwap));
     camelot.collectAmount = (camelot.collectAmount * newAmount) / oldAmount;
     return abi.encode(camelot);
   }
@@ -146,7 +152,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Platypus memory platypus = abi.decode(data, (IExecutorHelper.Platypus));
+    IExecutorHelperStruct.Platypus memory platypus =
+      abi.decode(data, (IExecutorHelperStruct.Platypus));
     platypus.collectAmount = (platypus.collectAmount * newAmount) / oldAmount;
     return abi.encode(platypus);
   }
@@ -158,7 +165,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.WSTETH memory wstEthData = abi.decode(data, (IExecutorHelper.WSTETH));
+    IExecutorHelperStruct.WSTETH memory wstEthData =
+      abi.decode(data, (IExecutorHelperStruct.WSTETH));
     wstEthData.amount = (wstEthData.amount * newAmount) / oldAmount;
     return abi.encode(wstEthData);
   }
@@ -167,7 +175,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.PSM memory psm = abi.decode(data, (IExecutorHelper.PSM));
+    IExecutorHelperStruct.PSM memory psm = abi.decode(data, (IExecutorHelperStruct.PSM));
     psm.amountIn = (psm.amountIn * newAmount) / oldAmount;
     return abi.encode(psm);
   }
@@ -179,7 +187,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniSwap memory frax = abi.decode(data, (IExecutorHelper.UniSwap));
+    IExecutorHelperStruct.UniSwap memory frax = abi.decode(data, (IExecutorHelperStruct.UniSwap));
     frax.collectAmount = (frax.collectAmount * newAmount) / oldAmount;
     return abi.encode(frax);
   }
@@ -203,7 +211,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Maverick memory maverick = abi.decode(data, (IExecutorHelper.Maverick));
+    IExecutorHelperStruct.Maverick memory maverick =
+      abi.decode(data, (IExecutorHelperStruct.Maverick));
     maverick.swapAmount = (maverick.swapAmount * newAmount) / oldAmount;
     return abi.encode(maverick);
   }
@@ -215,7 +224,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.SyncSwap memory syncSwap = abi.decode(data, (IExecutorHelper.SyncSwap));
+    IExecutorHelperStruct.SyncSwap memory syncSwap =
+      abi.decode(data, (IExecutorHelperStruct.SyncSwap));
     syncSwap.collectAmount = (syncSwap.collectAmount * newAmount) / oldAmount;
     return abi.encode(syncSwap);
   }
@@ -227,7 +237,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.AlgebraV1 memory algebraV1Swap = abi.decode(data, (IExecutorHelper.AlgebraV1));
+    IExecutorHelperStruct.AlgebraV1 memory algebraV1Swap =
+      abi.decode(data, (IExecutorHelperStruct.AlgebraV1));
     algebraV1Swap.swapAmount = (algebraV1Swap.swapAmount * newAmount) / oldAmount;
     return abi.encode(algebraV1Swap);
   }
@@ -239,8 +250,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.BalancerBatch memory balancerBatch =
-      abi.decode(data, (IExecutorHelper.BalancerBatch));
+    IExecutorHelperStruct.BalancerBatch memory balancerBatch =
+      abi.decode(data, (IExecutorHelperStruct.BalancerBatch));
     balancerBatch.amountIn = (balancerBatch.amountIn * newAmount) / oldAmount;
     return abi.encode(balancerBatch);
   }
@@ -252,7 +263,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Mantis memory mantis = abi.decode(data, (IExecutorHelper.Mantis));
+    IExecutorHelperStruct.Mantis memory mantis = abi.decode(data, (IExecutorHelperStruct.Mantis));
     mantis.amount = (mantis.amount * newAmount) / oldAmount;
     return abi.encode(mantis);
   }
@@ -264,7 +275,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.IziSwap memory iZi = abi.decode(data, (IExecutorHelper.IziSwap));
+    IExecutorHelperStruct.IziSwap memory iZi = abi.decode(data, (IExecutorHelperStruct.IziSwap));
     iZi.swapAmount = (iZi.swapAmount * newAmount) / oldAmount;
     return abi.encode(iZi);
   }
@@ -276,7 +287,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.TraderJoeV2 memory traderJoe = abi.decode(data, (IExecutorHelper.TraderJoeV2));
+    IExecutorHelperStruct.TraderJoeV2 memory traderJoe =
+      abi.decode(data, (IExecutorHelperStruct.TraderJoeV2));
 
     // traderJoe.collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
     traderJoe.collectAmount = (traderJoe.collectAmount & (1 << 255))
@@ -291,7 +303,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.LevelFiV2 memory levelFiV2 = abi.decode(data, (IExecutorHelper.LevelFiV2));
+    IExecutorHelperStruct.LevelFiV2 memory levelFiV2 =
+      abi.decode(data, (IExecutorHelperStruct.LevelFiV2));
     levelFiV2.amountIn = (levelFiV2.amountIn * newAmount) / oldAmount;
     return abi.encode(levelFiV2);
   }
@@ -303,7 +316,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.GMXGLP memory swapData = abi.decode(data, (IExecutorHelper.GMXGLP));
+    IExecutorHelperStruct.GMXGLP memory swapData = abi.decode(data, (IExecutorHelperStruct.GMXGLP));
     swapData.swapAmount = (swapData.swapAmount * newAmount) / oldAmount;
     return abi.encode(swapData);
   }
@@ -315,7 +328,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Vooi memory vooi = abi.decode(data, (IExecutorHelper.Vooi));
+    IExecutorHelperStruct.Vooi memory vooi = abi.decode(data, (IExecutorHelperStruct.Vooi));
     vooi.fromAmount = (vooi.fromAmount * newAmount) / oldAmount;
     return abi.encode(vooi);
   }
@@ -327,7 +340,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.VelocoreV2 memory velocorev2 = abi.decode(data, (IExecutorHelper.VelocoreV2));
+    IExecutorHelperStruct.VelocoreV2 memory velocorev2 =
+      abi.decode(data, (IExecutorHelperStruct.VelocoreV2));
     velocorev2.amount = (velocorev2.amount * newAmount) / oldAmount;
     return abi.encode(velocorev2);
   }
@@ -339,8 +353,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.MaticMigrate memory maticMigrate =
-      abi.decode(data, (IExecutorHelper.MaticMigrate));
+    IExecutorHelperStruct.MaticMigrate memory maticMigrate =
+      abi.decode(data, (IExecutorHelperStruct.MaticMigrate));
     maticMigrate.amount = (maticMigrate.amount * newAmount) / oldAmount;
     return abi.encode(maticMigrate);
   }
@@ -352,7 +366,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Kokonut memory kokonut = abi.decode(data, (IExecutorHelper.Kokonut));
+    IExecutorHelperStruct.Kokonut memory kokonut = abi.decode(data, (IExecutorHelperStruct.Kokonut));
     kokonut.dx = (kokonut.dx * newAmount) / oldAmount;
     return abi.encode(kokonut);
   }
@@ -364,7 +378,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.BalancerV1 memory balancerV1 = abi.decode(data, (IExecutorHelper.BalancerV1));
+    IExecutorHelperStruct.BalancerV1 memory balancerV1 =
+      abi.decode(data, (IExecutorHelperStruct.BalancerV1));
     balancerV1.amount = (balancerV1.amount * newAmount) / oldAmount;
     return abi.encode(balancerV1);
   }
@@ -376,8 +391,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.ArbswapStable memory arbswapStable =
-      abi.decode(data, (IExecutorHelper.ArbswapStable));
+    IExecutorHelperStruct.ArbswapStable memory arbswapStable =
+      abi.decode(data, (IExecutorHelperStruct.ArbswapStable));
     arbswapStable.dx = (arbswapStable.dx * newAmount) / oldAmount;
     return abi.encode(arbswapStable);
   }
@@ -389,7 +404,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.BancorV2 memory bancorV2 = abi.decode(data, (IExecutorHelper.BancorV2));
+    IExecutorHelperStruct.BancorV2 memory bancorV2 =
+      abi.decode(data, (IExecutorHelperStruct.BancorV2));
     bancorV2.amount = (bancorV2.amount * newAmount) / oldAmount;
     return abi.encode(bancorV2);
   }
@@ -401,7 +417,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Ambient memory ambient = abi.decode(data, (IExecutorHelper.Ambient));
+    IExecutorHelperStruct.Ambient memory ambient = abi.decode(data, (IExecutorHelperStruct.Ambient));
     ambient.qty = uint128((uint256(ambient.qty) * newAmount) / oldAmount);
     return abi.encode(ambient);
   }
@@ -413,7 +429,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.LighterV2 memory structData = abi.decode(data, (IExecutorHelper.LighterV2));
+    IExecutorHelperStruct.LighterV2 memory structData =
+      abi.decode(data, (IExecutorHelperStruct.LighterV2));
     structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
@@ -425,7 +442,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.UniV1 memory structData = abi.decode(data, (IExecutorHelper.UniV1));
+    IExecutorHelperStruct.UniV1 memory structData = abi.decode(data, (IExecutorHelperStruct.UniV1));
     structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
@@ -449,8 +466,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.EtherFiWeETH memory structData =
-      abi.decode(data, (IExecutorHelper.EtherFiWeETH));
+    IExecutorHelperStruct.EtherFiWeETH memory structData =
+      abi.decode(data, (IExecutorHelperStruct.EtherFiWeETH));
     structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
@@ -462,7 +479,7 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.Kelp memory structData = abi.decode(data, (IExecutorHelper.Kelp));
+    IExecutorHelperStruct.Kelp memory structData = abi.decode(data, (IExecutorHelperStruct.Kelp));
     structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
@@ -474,7 +491,8 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.EthenaSusde memory structData = abi.decode(data, (IExecutorHelper.EthenaSusde));
+    IExecutorHelperStruct.EthenaSusde memory structData =
+      abi.decode(data, (IExecutorHelperStruct.EthenaSusde));
     structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
@@ -486,10 +504,17 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.RocketPool memory structData = abi.decode(data, (IExecutorHelper.RocketPool));
+    IExecutorHelperStruct.RocketPool memory structData =
+      abi.decode(data, (IExecutorHelperStruct.RocketPool));
     uint128 _amount =
       uint128((uint256(uint128(structData.isDepositAndAmount)) * newAmount) / oldAmount);
-    structData.isDepositAndAmount |= uint256(_amount);
+
+    bool _isDeposit = (structData.isDepositAndAmount >> 255) == 1;
+
+    // reset and create new variable for isDeposit and amount
+    structData.isDepositAndAmount = 0;
+    structData.isDepositAndAmount |= uint256(uint128(_amount));
+    structData.isDepositAndAmount |= uint256(_isDeposit ? 1 : 0) << 255;
     return abi.encode(structData);
   }
 
@@ -500,10 +525,121 @@ contract DexHelper01 {
     (bytes memory data, uint256 oldAmount, uint256 newAmount) =
       abi.decode(scalingData, (bytes, uint256, uint256));
 
-    IExecutorHelper.MakersDAI memory structData = abi.decode(data, (IExecutorHelper.MakersDAI));
+    IExecutorHelperStruct.MakersDAI memory structData =
+      abi.decode(data, (IExecutorHelperStruct.MakersDAI));
     uint128 _amount =
       uint128((uint256(uint128(structData.isRedeemAndAmount)) * newAmount) / oldAmount);
-    structData.isRedeemAndAmount |= uint256(_amount);
+    bool _isRedeem = (structData.isRedeemAndAmount >> 255) == 1;
+
+    // reset and create new variable for isRedeem and amount
+    structData.isRedeemAndAmount = 0;
+    structData.isRedeemAndAmount |= uint256(uint128(_amount));
+    structData.isRedeemAndAmount |= uint256(_isRedeem ? 1 : 0) << 255;
+    return abi.encode(structData);
+  }
+
+  function executeRenzo(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.Renzo memory structData = abi.decode(data, (IExecutorHelperStruct.Renzo));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function executeFrxETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.FrxETH memory structData =
+      abi.decode(data, (IExecutorHelperStruct.FrxETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function executeSfrxETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.SfrxETH memory structData =
+      abi.decode(data, (IExecutorHelperStruct.SfrxETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function executeSfrxETHConvertor(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.SfrxETHConvertor memory structData =
+      abi.decode(data, (IExecutorHelperStruct.SfrxETHConvertor));
+    uint128 _amount =
+      uint128((uint256(uint128(structData.isDepositAndAmount)) * newAmount) / oldAmount);
+
+    bool _isDeposit = (structData.isDepositAndAmount >> 255) == 1;
+
+    // reset and create new variable for isDeposit and amount
+    structData.isDepositAndAmount = 0;
+    structData.isDepositAndAmount |= uint256(uint128(_amount));
+    structData.isDepositAndAmount |= uint256(_isDeposit ? 1 : 0) << 255;
+    return abi.encode(structData);
+  }
+
+  function executeOriginETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.OriginETH memory structData =
+      abi.decode(data, (IExecutorHelperStruct.OriginETH));
+    structData.amount = uint128((uint256(structData.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function executeMantleUsd(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 isWrapAndAmount = abi.decode(data, (uint256));
+
+    uint128 _amount = uint128((uint256(uint128(isWrapAndAmount)) * newAmount) / oldAmount);
+
+    bool _isWrap = (isWrapAndAmount >> 255) == 1;
+
+    // reset and create new variable for isWrap and amount
+    isWrapAndAmount = 0;
+    isWrapAndAmount |= uint256(uint128(_amount));
+    isWrapAndAmount |= uint256(_isWrap ? 1 : 0) << 255;
+    return abi.encode(isWrapAndAmount);
+  }
+
+  function executePufferFinance(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.PufferFinance memory structData =
+      abi.decode(data, (IExecutorHelperStruct.PufferFinance));
+    structData.permit.amount = uint128((uint256(structData.permit.amount) * newAmount) / oldAmount);
     return abi.encode(structData);
   }
 }
