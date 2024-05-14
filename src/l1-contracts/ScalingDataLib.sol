@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IExecutorHelperStruct} from './interfaces/IExecutorHelperStruct.sol';
+import {IExecutorHelperStruct} from 'src/interfaces/IExecutorHelperStruct.sol';
 
 library ScalingDataLib {
   function newUniSwap(
@@ -553,6 +553,17 @@ library ScalingDataLib {
     IExecutorHelperStruct.PufferFinance memory structData =
       abi.decode(data, (IExecutorHelperStruct.PufferFinance));
     structData.permit.amount = uint128((uint256(structData.permit.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function newKyberRfq(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperStruct.KyberRFQ memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberRFQ));
+    structData.amount = (structData.amount * newAmount) / oldAmount;
     return abi.encode(structData);
   }
 }

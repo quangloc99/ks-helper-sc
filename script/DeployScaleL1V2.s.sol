@@ -3,7 +3,7 @@ pragma solidity 0.8.25;
 
 import 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
-import {InputScalingHelperV2} from 'src/InputScalingHelperV2.sol';
+import {InputScalingHelperV2} from 'src/l1-contracts/InputScalingHelperV2.sol';
 
 contract DeployScaleL1V2 is Script {
   function run() external {

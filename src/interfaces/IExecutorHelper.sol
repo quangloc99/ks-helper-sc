@@ -4,6 +4,12 @@ pragma solidity ^0.8.0;
 import './IExecutorHelperStruct.sol';
 
 interface IExecutorHelper is IExecutorHelperStruct {
+  function executeBebop(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  // supported dexes
   function executeUniswap(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -25,11 +31,6 @@ interface IExecutorHelper is IExecutorHelperStruct {
   ) external payable returns (uint256);
 
   function executeUniV3KSElastic(
-    bytes memory data,
-    uint256 flagsAndPrevAmountOut
-  ) external payable returns (uint256);
-
-  function executeRfq(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
@@ -90,11 +91,6 @@ interface IExecutorHelper is IExecutorHelperStruct {
   ) external payable returns (uint256);
 
   function executeCamelot(
-    bytes memory data,
-    uint256 flagsAndPrevAmountOut
-  ) external payable returns (uint256);
-
-  function executeKyberLimitOrder(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
@@ -229,16 +225,6 @@ interface IExecutorHelper is IExecutorHelperStruct {
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
 
-  function executeNative(
-    bytes memory data,
-    uint256 flagsAndPrevAmountOut
-  ) external payable returns (uint256);
-
-  function executeBebop(
-    bytes memory data,
-    uint256 flagsAndPrevAmountOut
-  ) external payable returns (uint256);
-
   function executeLighterV2(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
@@ -345,6 +331,26 @@ interface IExecutorHelper is IExecutorHelperStruct {
   ) external payable returns (uint256);
 
   function executePufferFinance(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeRfq(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeNative(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeKyberLimitOrder(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeKyberDSLO(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {IKyberLO} from './pools/IKyberLO.sol';
+import {IKyberDSLO} from './pools/IKyberDSLO.sol';
+
 interface IExecutorHelperStruct {
   struct Swap {
     bytes data;
@@ -362,5 +365,76 @@ interface IExecutorHelperStruct {
     address pool;
     bool isStETH;
     Permit permit;
+  }
+
+  struct StaderETHx {
+    uint256 amount;
+    address recipient;
+  }
+
+  struct RFQTQuote {
+    address pool;
+    address externalAccount;
+    address trader;
+    address effectiveTrader;
+    address baseToken;
+    address quoteToken;
+    uint256 effectiveBaseTokenAmount;
+    uint256 baseTokenAmount;
+    uint256 quoteTokenAmount;
+    uint256 quoteExpiry;
+    uint256 nonce;
+    bytes32 txid;
+    bytes signature;
+  }
+
+  struct Hashflow {
+    address router;
+    RFQTQuote quote;
+  }
+
+  struct OrderRFQ {
+    // lowest 64 bits is the order id, next 64 bits is the expiration timestamp
+    // highest bit is unwrap WETH flag which is set on taker's side
+    // [unwrap eth(1 bit) | unused (127 bits) | expiration timestamp(64 bits) | orderId (64 bits)]
+    uint256 info;
+    address makerAsset;
+    address takerAsset;
+    address maker;
+    address allowedSender; // null address on public orders
+    uint256 makingAmount;
+    uint256 takingAmount;
+  }
+
+  struct KyberRFQ {
+    address rfq;
+    OrderRFQ order;
+    bytes signature;
+    uint256 amount;
+    address payable target;
+  }
+
+  struct Native {
+    address target; // txRequest.target from api result
+    uint256 amount; // should equal which amount_wei from api request
+    bytes data; // txRequest.calldata from api result
+    address tokenIn;
+    address tokenOut;
+    address recipient; // should equal which to_address from api request
+    uint256 multihopAndOffset; // [1 bytes multihop + 127 bytes empty + 64 bytes amountInOffset + 64 bytes amountOutMinOffset]
+  }
+
+  struct KyberDSLO {
+    address kyberLOAddress;
+    address makerAsset;
+    address takerAsset;
+    IKyberDSLO.FillBatchOrdersParams params;
+  }
+
+  struct KyberLimitOrder {
+    address kyberLOAddress;
+    address makerAsset;
+    address takerAsset;
+    IKyberLO.FillBatchOrdersParams params;
   }
 }

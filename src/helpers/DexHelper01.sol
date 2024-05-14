@@ -2,12 +2,13 @@
 pragma solidity 0.8.25;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-
 import {IExecutorHelperStruct} from '../interfaces/IExecutorHelperStruct.sol';
-
 import {RevertReasonParser} from '../libraries/RevertReasonParser.sol';
+import {BytesHelper} from '../libraries/BytesHelper.sol';
 
 contract DexHelper01 {
+  using BytesHelper for bytes;
+
   function executeUniswap(
     bytes memory scalingData,
     uint256 /*  */
@@ -640,6 +641,162 @@ contract DexHelper01 {
     IExecutorHelperStruct.PufferFinance memory structData =
       abi.decode(data, (IExecutorHelperStruct.PufferFinance));
     structData.permit.amount = uint128((uint256(structData.permit.amount) * newAmount) / oldAmount);
+    return abi.encode(structData);
+  }
+
+  function executeSwellETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function executeRswETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function executeStaderETHx(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.StaderETHx memory structData =
+      abi.decode(data, (IExecutorHelperStruct.StaderETHx));
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
+
+  function executeBedrockUniETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function executeWBETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function executeMantleETH(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 amount = abi.decode(data, (uint256));
+    amount = (amount * newAmount) / oldAmount;
+    return abi.encode(amount);
+  }
+
+  function executeHashflow(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.Hashflow memory structData =
+      abi.decode(data, (IExecutorHelperStruct.Hashflow));
+    structData.quote.effectiveBaseTokenAmount =
+      (structData.quote.effectiveBaseTokenAmount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
+
+  function executeRfq(bytes memory scalingData, uint256 /*  */ ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.KyberRFQ memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberRFQ));
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
+
+  function executeNative(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    require(newAmount < oldAmount, 'Native: not support scale up');
+
+    IExecutorHelperStruct.Native memory structData =
+      abi.decode(data, (IExecutorHelperStruct.Native));
+
+    require(structData.multihopAndOffset >> 255 == 0, 'Native: Multihop not supported');
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+
+    uint256 amountInOffset = uint256(uint64(structData.multihopAndOffset >> 64));
+    uint256 amountOutMinOffset = uint256(uint64(structData.multihopAndOffset));
+    bytes memory newCallData = structData.data;
+
+    newCallData = newCallData.update(structData.amount, amountInOffset);
+
+    // update amount out min if needed
+    if (amountOutMinOffset != 0) {
+      newCallData = newCallData.update(1, amountOutMinOffset);
+    }
+
+    return abi.encode(structData);
+  }
+
+  function executeKyberLimitOrder(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.KyberLimitOrder memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberLimitOrder));
+    structData.params.takingAmount = (structData.params.takingAmount * newAmount) / oldAmount;
+
+    structData.params.thresholdAmount = 1;
+    return abi.encode(structData);
+  }
+
+  function executeKyberDSLO(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.KyberDSLO memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberDSLO));
+    structData.params.takingAmount = (structData.params.takingAmount * newAmount) / oldAmount;
+
+    structData.params.thresholdAmount = 1;
     return abi.encode(structData);
   }
 }
