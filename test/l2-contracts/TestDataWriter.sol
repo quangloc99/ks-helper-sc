@@ -86,8 +86,8 @@ contract TestDataWriter is AssertionHelper {
   function _createDexData(
     InputScalingHelperL2.DexIndex dexType,
     uint256 sequenceIndex
-  ) internal returns (IExecutorL2.Swap memory swap) {
-    function(uint256) internal returns(IExecutorL2.Swap memory) fn;
+  ) internal view returns (IExecutorL2.Swap memory swap) {
+    function(uint256) internal view returns(IExecutorL2.Swap memory) fn;
 
     if (
       dexType == InputScalingHelperL2.DexIndex.UNI
@@ -177,9 +177,13 @@ contract TestDataWriter is AssertionHelper {
     swap.functionSelector = bytes4(uint32(dexType));
   }
 
-  function _nothing(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {}
+  function _nothing(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {}
 
-  function _createUniSwap(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createUniSwap(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.UniSwap memory data;
     data.collectAmount = mockParams.amount;
     swap.data = writer.writeUniSwap({
@@ -190,13 +194,17 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createStableSwap(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createStableSwap(uint256) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.StableSwap memory data;
     data.dx = mockParams.amount;
     swap.data = writer.writeStableSwap({swap: data, poolIndex: 0});
   }
 
-  function _createCurveSwap(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createCurveSwap(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.CurveSwap memory data;
     data.dx = mockParams.amount;
     swap.data = writer.writeCurveSwap({
@@ -209,6 +217,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createUniswapV3KSElastic(uint256 sequenceIndex)
     internal
+    view
     returns (IExecutorL2.Swap memory swap)
   {
     IExecutorHelperL2.UniswapV3KSElastic memory data;
@@ -221,7 +230,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createBalancerV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createBalancerV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.BalancerV2 memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeBalancerV2({
@@ -232,7 +245,7 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createDODO(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createDODO(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.DODO memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeDODO({
@@ -243,7 +256,7 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createGMX(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createGMX(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.GMX memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeGMX({
@@ -254,7 +267,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createSynthetix(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createSynthetix(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Synthetix memory data;
     data.sourceAmount = mockParams.amount;
     swap.data = writer.writeSynthetix({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
@@ -262,6 +279,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createWrappedstETH(uint256 sequenceIndex)
     internal
+    view
     returns (IExecutorL2.Swap memory swap)
   {
     IExecutorHelperL2.WSTETH memory data;
@@ -269,12 +287,16 @@ contract TestDataWriter is AssertionHelper {
     swap.data = writer.writeWrappedstETH({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 
-  function _createStETH(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createStETH(uint256) internal view returns (IExecutorL2.Swap memory swap) {
     uint128 amount = uint128(mockParams.amount);
     swap.data = abi.encodePacked(amount);
   }
 
-  function _createPlatypus(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createPlatypus(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Platypus memory data;
     data.collectAmount = mockParams.amount;
     swap.data = writer.writePlatypus({
@@ -285,7 +307,7 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createPSM(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createPSM(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.PSM memory data;
     data.amountIn = mockParams.amount;
     swap.data = writer.writePSM({
@@ -296,7 +318,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createMaverick(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createMaverick(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Maverick memory data;
     data.swapAmount = mockParams.amount;
     swap.data = writer.writeMaverick({
@@ -307,13 +333,21 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createSyncSwap(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createSyncSwap(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.SyncSwap memory data;
     data.collectAmount = mockParams.amount;
     swap.data = writer.writeSyncSwap({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 
-  function _createAlgebraV1(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createAlgebraV1(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.AlgebraV1 memory data;
     data.swapAmount = mockParams.amount;
     swap.data = writer.writeAlgebraV1({
@@ -326,6 +360,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createBalancerBatch(uint256 sequenceIndex)
     internal
+    view
     returns (IExecutorL2.Swap memory swap)
   {
     IExecutorHelperL2.BalancerBatch memory data;
@@ -333,7 +368,11 @@ contract TestDataWriter is AssertionHelper {
     swap.data = writer.writeBalancerBatch({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 
-  function _createMantis(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createMantis(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Mantis memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeMantis({
@@ -344,7 +383,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createIziSwap(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createIziSwap(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.IziSwap memory data;
     data.swapAmount = mockParams.amount;
     swap.data = writer.writeIziSwap({
@@ -357,6 +400,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createTraderJoeV2(uint256 sequenceIndex)
     internal
+    view
     returns (IExecutorL2.Swap memory swap)
   {
     IExecutorHelperL2.TraderJoeV2 memory data;
@@ -369,7 +413,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createLevelFiV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createLevelFiV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.LevelFiV2 memory data;
     data.amountIn = mockParams.amount;
     swap.data = writer.writeLevelFiV2({
@@ -380,7 +428,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createGMXGLP(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createGMXGLP(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.GMXGLP memory data;
     data.swapAmount = mockParams.amount;
     swap.data = writer.writeGMXGLP({
@@ -392,7 +444,7 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createVooi(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createVooi(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.Vooi memory data;
     data.fromAmount = mockParams.amount;
     swap.data = writer.writeVooi({
@@ -403,7 +455,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createVelocoreV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createVelocoreV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.VelocoreV2 memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeVelocoreV2({
@@ -414,7 +470,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createKokonut(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createKokonut(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Kokonut memory data;
     data.dx = mockParams.amount;
     swap.data = writer.writeKokonut({
@@ -425,7 +485,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createBalancerV1(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createBalancerV1(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.BalancerV1 memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeBalancerV1({
@@ -438,6 +502,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createArbswapStable(uint256 sequenceIndex)
     internal
+    view
     returns (IExecutorL2.Swap memory swap)
   {
     IExecutorHelperL2.ArbswapStable memory data;
@@ -450,7 +515,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createBancorV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createBancorV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.BancorV2 memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeBancorV2({
@@ -461,13 +530,21 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createAmbient(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createAmbient(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.Ambient memory data;
     data.qty = uint128(mockParams.amount);
     swap.data = writer.writeAmbient({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
   }
 
-  function _createLighterV2(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createLighterV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.LighterV2 memory data;
     data.amount = uint128(mockParams.amount);
     swap.data = writer.writeLighterV2({
@@ -478,7 +555,11 @@ contract TestDataWriter is AssertionHelper {
     });
   }
 
-  function _createMaiPSM(uint256 sequenceIndex) internal returns (IExecutorL2.Swap memory swap) {
+  function _createMaiPSM(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
     IExecutorHelperL2.FrxETH memory data;
     data.amount = uint128(mockParams.amount);
     swap.data = writer.writeMaiPSM({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});

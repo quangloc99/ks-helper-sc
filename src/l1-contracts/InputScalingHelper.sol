@@ -2,9 +2,9 @@
 pragma solidity 0.8.25;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {IExecutorHelper} from './interfaces/IExecutorHelper.sol';
-import {IMetaAggregationRouterV2} from './interfaces/IMetaAggregationRouterV2.sol';
-import {ScalingDataLib} from './ScalingDataLib.sol';
+import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
+import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
+import {ScalingDataLib} from 'src/l1-contracts/ScalingDataLib.sol';
 
 /* ----------------------------------------
 .__   __.   ______   .___________. _______ 
@@ -294,8 +294,10 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newFrxETH(swap.data, oldAmount, newAmount); // same frxeth
       } else if (functionSelector == IExecutorHelper.executePufferFinance.selector) {
         swap.data = ScalingDataLib.newPufferFinance(swap.data, oldAmount, newAmount);
+      } else if (functionSelector == IExecutorHelper.executeRfq.selector) {
+        swap.data = ScalingDataLib.newKyberRfq(swap.data, oldAmount, newAmount);
       } else {
-        // RFQ, SwaapV2, Native, Bebop, Hashflow, KyberLO
+        // SwaapV2, Native, Bebop, Hashflow, KyberLO
         revert('AggregationExecutor: Dex type not supported');
       }
       unchecked {

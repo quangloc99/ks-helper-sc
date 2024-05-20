@@ -4,9 +4,9 @@ pragma solidity 0.8.25;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-import {IMetaAggregationRouterV2} from './interfaces/IMetaAggregationRouterV2.sol';
+import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 
-import {RevertReasonParser} from './libraries/RevertReasonParser.sol';
+import {RevertReasonParser} from 'src/libraries/RevertReasonParser.sol';
 
 contract InputScalingHelperV2 is Ownable {
   uint256 private constant _PARTIAL_FILL = 0x01;
@@ -78,6 +78,7 @@ contract InputScalingHelperV2 is Ownable {
       (params.desc, params.targetData) = _getScaledInputDataV2(
         params.desc, params.targetData, newAmount, _flagsChecked(params.desc.flags, _SIMPLE_SWAP)
       );
+
       return abi.encodeWithSelector(selector, params);
     } else if (selector == IMetaAggregationRouterV2.swapSimpleMode.selector) {
       (
@@ -127,18 +128,19 @@ contract InputScalingHelperV2 is Ownable {
     IMetaAggregationRouterV2.SwapDescriptionV2 memory desc,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal pure returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory) {
+  ) internal view returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory) {
     desc.minReturnAmount = (desc.minReturnAmount * newAmount) / oldAmount;
     if (desc.minReturnAmount == 0) desc.minReturnAmount = 1;
     desc.amount = newAmount;
 
     uint256 nReceivers = desc.srcReceivers.length;
-    for (uint256 i = 0; i < nReceivers;) {
+    for (uint256 i; i < nReceivers;) {
       desc.srcAmounts[i] = (desc.srcAmounts[i] * newAmount) / oldAmount;
       unchecked {
         ++i;
       }
     }
+
     return desc;
   }
 
@@ -169,10 +171,12 @@ contract InputScalingHelperV2 is Ownable {
     uint256 newAmount
   ) internal view returns (bytes memory) {
     SwapExecutorDescription memory executorDesc = abi.decode(data, (SwapExecutorDescription));
+
     executorDesc.positiveSlippageData =
       _scaledPositiveSlippageFeeData(executorDesc.positiveSlippageData, oldAmount, newAmount);
 
     uint256 nSequences = executorDesc.swapSequences.length;
+
     for (uint256 i = 0; i < nSequences;) {
       Swap memory swap = executorDesc.swapSequences[i][0];
       bytes4 functionSelector = bytes4(swap.selectorAndFlags);
@@ -188,7 +192,7 @@ contract InputScalingHelperV2 is Ownable {
         revert(RevertReasonParser.parse(returnData, 'InputScalingHelper call failed: '));
       }
 
-      swap.data = returnData;
+      swap.data = abi.decode(returnData, (bytes));
 
       unchecked {
         ++i;
