@@ -2,8 +2,11 @@
 pragma solidity 0.8.25;
 
 import {IExecutorHelperStruct} from 'src/interfaces/IExecutorHelperStruct.sol';
+import {BytesHelper} from '../libraries/BytesHelper.sol';
 
 library ScalingDataLib {
+  using BytesHelper for bytes;
+
   function newUniSwap(
     bytes memory data,
     uint256 oldAmount,
@@ -34,17 +37,6 @@ library ScalingDataLib {
       abi.decode(data, (IExecutorHelperStruct.CurveSwap));
     curveSwap.dx = (curveSwap.dx * newAmount) / oldAmount;
     return abi.encode(curveSwap);
-  }
-
-  function newKyberDMM(
-    bytes memory data,
-    uint256 oldAmount,
-    uint256 newAmount
-  ) internal pure returns (bytes memory) {
-    IExecutorHelperStruct.UniSwap memory kyberDMMSwap =
-      abi.decode(data, (IExecutorHelperStruct.UniSwap));
-    kyberDMMSwap.collectAmount = (kyberDMMSwap.collectAmount * newAmount) / oldAmount;
-    return abi.encode(kyberDMMSwap);
   }
 
   function newUniV3ProMM(
@@ -78,17 +70,6 @@ library ScalingDataLib {
     IExecutorHelperStruct.DODO memory dodo = abi.decode(data, (IExecutorHelperStruct.DODO));
     dodo.amount = (dodo.amount * newAmount) / oldAmount;
     return abi.encode(dodo);
-  }
-
-  function newVelodrome(
-    bytes memory data,
-    uint256 oldAmount,
-    uint256 newAmount
-  ) internal pure returns (bytes memory) {
-    IExecutorHelperStruct.UniSwap memory velodrome =
-      abi.decode(data, (IExecutorHelperStruct.UniSwap));
-    velodrome.collectAmount = (velodrome.collectAmount * newAmount) / oldAmount;
-    return abi.encode(velodrome);
   }
 
   function newGMX(
@@ -152,16 +133,6 @@ library ScalingDataLib {
     IExecutorHelperStruct.PSM memory psm = abi.decode(data, (IExecutorHelperStruct.PSM));
     psm.amountIn = (psm.amountIn * newAmount) / oldAmount;
     return abi.encode(psm);
-  }
-
-  function newFrax(
-    bytes memory data,
-    uint256 oldAmount,
-    uint256 newAmount
-  ) internal pure returns (bytes memory) {
-    IExecutorHelperStruct.UniSwap memory frax = abi.decode(data, (IExecutorHelperStruct.UniSwap));
-    frax.collectAmount = (frax.collectAmount * newAmount) / oldAmount;
-    return abi.encode(frax);
   }
 
   function newStETHSwap(
@@ -379,16 +350,6 @@ library ScalingDataLib {
     return abi.encode(structData);
   }
 
-  function newEtherFieETH(
-    bytes memory data,
-    uint256 oldAmount,
-    uint256 newAmount
-  ) internal pure returns (bytes memory) {
-    uint256 depositAmount = abi.decode(data, (uint256));
-    depositAmount = uint128((depositAmount * newAmount) / oldAmount);
-    return abi.encode(depositAmount);
-  }
-
   function newEtherFiWeETH(
     bytes memory data,
     uint256 oldAmount,
@@ -564,6 +525,70 @@ library ScalingDataLib {
     IExecutorHelperStruct.KyberRFQ memory structData =
       abi.decode(data, (IExecutorHelperStruct.KyberRFQ));
     structData.amount = (structData.amount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
+
+  function newKyberLimitOrder(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperStruct.KyberLimitOrder memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberLimitOrder));
+    structData.params.takingAmount = (structData.params.takingAmount * newAmount) / oldAmount;
+    structData.params.thresholdAmount = 1;
+    return abi.encode(structData);
+  }
+
+  function newKyberDSLO(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperStruct.KyberDSLO memory structData =
+      abi.decode(data, (IExecutorHelperStruct.KyberDSLO));
+    structData.params.takingAmount = (structData.params.takingAmount * newAmount) / oldAmount;
+    structData.params.thresholdAmount = 1;
+    return abi.encode(structData);
+  }
+
+  function newNative(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    require(newAmount < oldAmount, 'Native: not support scale up');
+
+    IExecutorHelperStruct.Native memory structData =
+      abi.decode(data, (IExecutorHelperStruct.Native));
+
+    require(structData.multihopAndOffset >> 255 == 0, 'Native: Multihop not supported');
+
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+
+    uint256 amountInOffset = uint256(uint64(structData.multihopAndOffset >> 64));
+    uint256 amountOutMinOffset = uint256(uint64(structData.multihopAndOffset));
+    bytes memory newCallData = structData.data;
+
+    newCallData = newCallData.update(structData.amount, amountInOffset);
+
+    // update amount out min if needed
+    if (amountOutMinOffset != 0) {
+      newCallData = newCallData.update(1, amountOutMinOffset);
+    }
+
+    return abi.encode(structData);
+  }
+
+  function newHashflow(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperStruct.Hashflow memory structData =
+      abi.decode(data, (IExecutorHelperStruct.Hashflow));
+    structData.quote.effectiveBaseTokenAmount =
+      (structData.quote.effectiveBaseTokenAmount * newAmount) / oldAmount;
     return abi.encode(structData);
   }
 }
