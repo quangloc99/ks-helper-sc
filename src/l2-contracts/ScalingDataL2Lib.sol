@@ -278,4 +278,44 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleMaiPSM(oldAmount, newAmount);
   }
+
+  function newNative(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleNative(oldAmount, newAmount);
+  }
+
+  function newDSLO(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleDSLO(oldAmount, newAmount);
+  }
+
+  function newHashflow(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleHashflow(oldAmount, newAmount);
+  }
+
+  function newKyberRFQ(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleKyberRFQ(oldAmount, newAmount);
+  }
+
+  function newBebop(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleBebop(oldAmount, newAmount);
+  }
 }

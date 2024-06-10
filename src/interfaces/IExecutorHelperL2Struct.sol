@@ -1,14 +1,11 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IKyberLO} from './pools/IKyberLO.sol';
 import {IKyberDSLO} from './pools/IKyberDSLO.sol';
-import {IBebopV3} from './pools/IBebopV3.sol';
 
-interface IExecutorHelperStruct {
+interface IExecutorHelperL2Struct {
   struct Swap {
     bytes data;
-    bytes32 selectorAndFlags; // [selector (32 bits) + flags (224 bits)]; selector is 4 most significant bytes; flags are stored in 4 least significant bytes.
+    bytes4 functionSelector;
   }
 
   struct SwapExecutorDescription {
@@ -65,6 +62,17 @@ interface IExecutorHelperStruct {
     bool isUniV3; // true = UniV3, false = KSElastic
   }
 
+  struct SwapCallbackData {
+    bytes path;
+    address payer;
+  }
+
+  struct SwapCallbackDataPath {
+    address pool;
+    address tokenIn;
+    address tokenOut;
+  }
+
   struct BalancerV2 {
     address vault;
     bytes32 poolId;
@@ -102,6 +110,12 @@ interface IExecutorHelperStruct {
     bool useAtomicExchange;
   }
 
+  struct WSTETH {
+    address pool;
+    uint256 amount;
+    bool isWrapping;
+  }
+
   struct Platypus {
     address pool;
     address tokenIn;
@@ -118,12 +132,6 @@ interface IExecutorHelperStruct {
     address recipient;
   }
 
-  struct WSTETH {
-    address pool;
-    uint256 amount;
-    bool isWrapping;
-  }
-
   struct Maverick {
     address pool;
     address tokenIn;
@@ -133,6 +141,16 @@ interface IExecutorHelperStruct {
     uint256 sqrtPriceLimitD18;
   }
 
+  /// @notice Struct for Sync Swap
+  /// @param _data encode of (address, address, uint8) : (tokenIn, recipient, withdrawMode)
+  ///  Withdraw with mode.
+  // 0 = DEFAULT
+  // 1 = UNWRAPPED
+  // 2 = WRAPPED
+  /// @param vault vault contract
+  /// @param tokenIn token input to swap
+  /// @param pool pool of SyncSwap
+  /// @param collectAmount amount that should be transferred to the pool
   struct SyncSwap {
     bytes _data;
     address vault;
@@ -181,7 +199,7 @@ interface IExecutorHelperStruct {
     address pool;
     address tokenIn;
     address tokenOut;
-    uint256 collectAmount; // most significant 1 bit is to determine whether pool is v2.1, else v2.0
+    uint256 collectAmount; // most significant 1 bit is to determine whether pool is v2.0, else v2.1
   }
 
   struct LevelFiV2 {
@@ -241,9 +259,9 @@ interface IExecutorHelperStruct {
 
   struct BalancerV1 {
     address pool;
+    uint256 amount;
     address tokenIn;
     address tokenOut;
-    uint256 amount;
   }
 
   struct ArbswapStable {
@@ -270,14 +288,6 @@ interface IExecutorHelperStruct {
     uint8 settleFlags;
   }
 
-  struct UniV1 {
-    address pool;
-    uint256 amount;
-    address tokenIn;
-    address tokenOut;
-    address recipient;
-  }
-
   struct LighterV2 {
     address orderBook;
     uint256 amount;
@@ -287,81 +297,10 @@ interface IExecutorHelperStruct {
     address recipient;
   }
 
-  struct EtherFiWeETH {
-    uint256 amount;
-    bool isWrapping;
-  }
-
-  struct Kelp {
-    uint256 amount;
-    address tokenIn;
-  }
-
-  struct EthenaSusde {
-    uint256 amount;
-    address recipient;
-  }
-
-  struct RocketPool {
-    address pool;
-    uint256 isDepositAndAmount; // 1 isDeposit + 127 empty + 128 amount token in
-  }
-
-  struct MakersDAI {
-    uint256 isRedeemAndAmount; // 1 isRedeem + 127 empty + 128 amount token in
-    address recipient;
-  }
-
-  struct Renzo {
-    address pool;
-    uint256 amount;
-    address tokenIn;
-    address tokenOut;
-  }
-
   struct FrxETH {
     address pool;
     uint256 amount;
     address tokenOut;
-  }
-
-  struct SfrxETH {
-    address pool;
-    uint256 amount;
-    address tokenOut;
-    address recipient;
-  }
-
-  struct SfrxETHConvertor {
-    address pool;
-    uint256 isDepositAndAmount; // 1 isDeposit + 127 empty + 128 amount token in
-    address tokenIn;
-    address tokenOut;
-    address recipient;
-  }
-
-  struct OriginETH {
-    address pool;
-    uint256 amount;
-  }
-
-  struct Permit {
-    uint256 deadline;
-    uint256 amount;
-    uint8 v;
-    bytes32 r;
-    bytes32 s;
-  }
-
-  struct PufferFinance {
-    address pool;
-    bool isStETH;
-    Permit permit;
-  }
-
-  struct StaderETHx {
-    uint256 amount;
-    address recipient;
   }
 
   struct RFQTQuote {
@@ -421,13 +360,6 @@ interface IExecutorHelperStruct {
     address makerAsset;
     address takerAsset;
     IKyberDSLO.FillBatchOrdersParams params;
-  }
-
-  struct KyberLimitOrder {
-    address kyberLOAddress;
-    address makerAsset;
-    address takerAsset;
-    IKyberLO.FillBatchOrdersParams params;
   }
 
   struct Bebop {

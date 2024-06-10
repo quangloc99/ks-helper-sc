@@ -4,11 +4,6 @@ pragma solidity ^0.8.0;
 import './IExecutorHelperStruct.sol';
 
 interface IExecutorHelper is IExecutorHelperStruct {
-  function executeBebop(
-    bytes memory data,
-    uint256 flagsAndPrevAmountOut
-  ) external payable returns (uint256);
-
   // supported dexes
   function executeUniswap(
     bytes memory data,
@@ -351,6 +346,11 @@ interface IExecutorHelper is IExecutorHelperStruct {
   ) external payable returns (uint256);
 
   function executeKyberDSLO(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeBebop(
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);

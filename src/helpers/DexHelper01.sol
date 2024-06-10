@@ -2,9 +2,10 @@
 pragma solidity 0.8.25;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import {IExecutorHelperStruct} from '../interfaces/IExecutorHelperStruct.sol';
-import {RevertReasonParser} from '../libraries/RevertReasonParser.sol';
-import {BytesHelper} from '../libraries/BytesHelper.sol';
+import {IExecutorHelperStruct} from 'src/interfaces/IExecutorHelperStruct.sol';
+import {IBebopV3} from 'src/interfaces/pools/IBebopV3.sol';
+import {RevertReasonParser} from 'src/libraries/RevertReasonParser.sol';
+import {BytesHelper} from 'src/libraries/BytesHelper.sol';
 
 contract DexHelper01 {
   using BytesHelper for bytes;
@@ -797,6 +798,29 @@ contract DexHelper01 {
     structData.params.takingAmount = (structData.params.takingAmount * newAmount) / oldAmount;
 
     structData.params.thresholdAmount = 1;
+    return abi.encode(structData);
+  }
+
+  function executeBebop(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    require(newAmount < oldAmount, 'Bebop: not support scale up');
+
+    IExecutorHelperStruct.Bebop memory structData = abi.decode(data, (IExecutorHelperStruct.Bebop));
+
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+
+    // update calldata with new swap amount
+    (bytes4 selector, bytes memory callData) = structData.data.splitCalldata();
+
+    (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
+      abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
+    structData.data = bytes.concat(bytes4(selector), abi.encode(s, m, structData.amount));
+
     return abi.encode(structData);
   }
 }
