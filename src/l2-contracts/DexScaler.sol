@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import './CalldataReader.sol';
-import '../interfaces/IExecutorHelperL2.sol';
-import {BytesHelper} from './BytesHelper.sol';
-import {Common} from './Common.sol';
+import {CalldataReader} from 'src/l2-contracts/CalldataReader.sol';
+import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
+import {IBebopV3} from 'src/interfaces/pools/IBebopV3.sol';
+import {BytesHelper} from 'src/l2-contracts/BytesHelper.sol';
+import {Common} from 'src/l2-contracts/Common.sol';
 
 /// @title DexScaler
 /// @notice Contain functions to scale DEX structs
@@ -530,5 +531,146 @@ library DexScaler {
     return data.write16Bytes(
       startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleMaiPSM'
     );
+  }
+
+  function scaleKyberRFQ(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // rfq
+
+    (, startByte) = data._readOrderRFQ(startByte); // order
+
+    (, startByte) = data._readBytes(startByte); // signature
+
+    (uint256 amount,) = data._readUint256(startByte); // amount
+
+    return data.write32Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleKyberRFQ'
+    );
+  }
+
+  function scaleDSLO(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readAddress(startByte); // kyberLOAddress
+
+    (, startByte) = data._readAddress(startByte); // makerAsset
+
+    (, startByte) = data._readAddress(startByte); // takerAsset
+
+    (
+      IKyberDSLO.FillBatchOrdersParams memory params,
+      ,
+      uint256 takingAmountStartByte,
+      uint256 thresholdStartByte
+    ) = data._readFillBatchOrdersParams(startByte); // FillBatchOrdersParams
+
+    data = data.write32Bytes(
+      takingAmountStartByte,
+      oldAmount == 0 ? 0 : (params.takingAmount * newAmount) / oldAmount,
+      'scaleDSLO'
+    );
+
+    return data.write32Bytes(thresholdStartByte, 1, 'scaleThreshold');
+  }
+
+  function scaleHashflow(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readAddress(startByte); // router
+
+    (IExecutorHelperL2.RFQTQuote memory rfqQuote,, uint256 ebtaStartByte) =
+      data._readRFQTQuote(startByte); // RFQTQuote
+
+    return data.write32Bytes(
+      ebtaStartByte,
+      oldAmount == 0 ? 0 : (rfqQuote.effectiveBaseTokenAmount * newAmount) / oldAmount,
+      'scaleHashflow'
+    );
+  }
+
+  function scaleNative(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    require(newAmount < oldAmount, 'Native: not support scale up');
+
+    uint256 startByte;
+    bytes memory strData;
+    uint256 amount;
+    uint256 multihopAndOffset;
+    uint256 strDataStartByte;
+
+    (, startByte) = data._readAddress(startByte); // target
+    (amount, startByte) = data._readUint256(startByte); // amount
+    (strData, startByte) = data._readBytes(startByte); // data
+    strDataStartByte = startByte;
+    (, startByte) = data._readAddress(startByte); // tokenIn
+    (, startByte) = data._readAddress(startByte); // tokenOut
+    (, startByte) = data._readAddress(startByte); // recipient
+    (multihopAndOffset, startByte) = data._readUint256(startByte); // multihopAndOffset
+
+    require(multihopAndOffset >> 255 == 0, 'Native: Multihop not supported');
+
+    amount = (amount * newAmount) / oldAmount;
+
+    uint256 amountInOffset = uint256(uint64(multihopAndOffset >> 64));
+    uint256 amountOutMinOffset = uint256(uint64(multihopAndOffset));
+    // bytes memory newCallData = strData;
+
+    strData = strData.write32Bytes(amountInOffset, amount, 'ScaleStructDataAmount');
+
+    // update amount out min if needed
+    if (amountOutMinOffset != 0) {
+      strData = strData.write32Bytes(amountOutMinOffset, 1, 'ScaleStructDataAmountOutMin');
+    }
+
+    return data.writeBytes(strDataStartByte, strData);
+  }
+
+  function scaleBebop(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    require(newAmount < oldAmount, 'Bebop: not support scale up');
+
+    uint256 startByte;
+    uint256 amount;
+    uint256 amountStartByte;
+    bytes memory txData;
+
+    (, startByte) = data._readAddress(startByte); // pool
+
+    (amount, startByte) = data._readUint256(startByte); // amount
+    amountStartByte = startByte;
+    (txData, startByte) = data._readBytes(startByte); // data
+
+    amount = (amount * newAmount) / oldAmount;
+
+    // update calldata with new swap amount
+    (bytes4 selector, bytes memory callData) = txData.splitCalldata();
+
+    (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
+      abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
+
+    txData = bytes.concat(bytes4(selector), abi.encode(s, m, amount));
+
+    data.write32Bytes(amountStartByte, amount, 'scaleBebopAmount');
+
+    return data.writeBytes(startByte, txData);
   }
 }

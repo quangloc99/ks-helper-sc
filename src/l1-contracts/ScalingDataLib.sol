@@ -2,7 +2,8 @@
 pragma solidity 0.8.25;
 
 import {IExecutorHelperStruct} from 'src/interfaces/IExecutorHelperStruct.sol';
-import {BytesHelper} from '../libraries/BytesHelper.sol';
+import {IBebopV3} from 'src/interfaces/pools/IBebopV3.sol';
+import {BytesHelper} from 'src/libraries/BytesHelper.sol';
 
 library ScalingDataLib {
   using BytesHelper for bytes;
@@ -589,6 +590,27 @@ library ScalingDataLib {
       abi.decode(data, (IExecutorHelperStruct.Hashflow));
     structData.quote.effectiveBaseTokenAmount =
       (structData.quote.effectiveBaseTokenAmount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
+
+  function newBebop(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    require(newAmount < oldAmount, 'Bebop: not support scale up');
+
+    IExecutorHelperStruct.Bebop memory structData = abi.decode(data, (IExecutorHelperStruct.Bebop));
+
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+
+    // update calldata with new swap amount
+    (bytes4 selector, bytes memory callData) = structData.data.splitCalldata();
+
+    (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
+      abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
+    structData.data = bytes.concat(bytes4(selector), abi.encode(s, m, structData.amount));
+
     return abi.encode(structData);
   }
 }

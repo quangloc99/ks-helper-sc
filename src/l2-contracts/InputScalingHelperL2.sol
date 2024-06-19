@@ -32,9 +32,6 @@ contract InputScalingHelperL2 {
     Velodrome,
     Fraxswap,
     Camelot,
-    KyberLO,
-    RFQ,
-    Hashflow,
     StableSwap,
     Curve,
     UniswapV3KSElastic,
@@ -55,7 +52,6 @@ contract InputScalingHelperL2 {
     WooFiV2,
     iZiSwap,
     TraderJoeV2,
-    KyberDSLO,
     LevelFiV2,
     GMXGLP,
     PancakeStableSwap,
@@ -74,7 +70,11 @@ contract InputScalingHelperL2 {
     Native,
     LighterV2,
     Bebop,
-    MaiPSM
+    MaiPSM,
+    Hashflow,
+    KyberLO,
+    KyberDSLO,
+    RFQ
   }
 
   function getScaledInputData(
@@ -251,14 +251,15 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newUniSwap(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.StableSwap) {
       swap.data = swap.data.newStableSwap(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Curve) {
+    } else if (
+      DexIndex(functionSelectorIndex) == DexIndex.Curve
+        || DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap
+    ) {
       swap.data = swap.data.newCurveSwap(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDMM) {
       swap.data = swap.data.newKyberDMM(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.UniswapV3KSElastic) {
       swap.data = swap.data.newUniswapV3KSElastic(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.RFQ) {
-      revert('InputScalingHelper: Can not scale RFQ swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerV2) {
       swap.data = swap.data.newBalancerV2(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.wstETH) {
@@ -273,12 +274,8 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newGMX(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Synthetix) {
       swap.data = swap.data.newSynthetix(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Hashflow) {
-      revert('InputScalingHelper: Can not scale Hashflow swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Camelot) {
       swap.data = swap.data.newCamelot(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberLO) {
-      revert('InputScalingHelper: Can not scale KyberLO swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.PSM) {
       swap.data = swap.data.newPSM(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Fraxswap) {
@@ -293,56 +290,56 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newAlgebraV1(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerBatch) {
       swap.data = swap.data.newBalancerBatch(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Mantis) {
+    } else if (
+      DexIndex(functionSelectorIndex) == DexIndex.Mantis
+        || DexIndex(functionSelectorIndex) == DexIndex.Wombat
+        || DexIndex(functionSelectorIndex) == DexIndex.WooFiV2
+        || DexIndex(functionSelectorIndex) == DexIndex.Smardex
+        || DexIndex(functionSelectorIndex) == DexIndex.SolidlyV2
+        || DexIndex(functionSelectorIndex) == DexIndex.NomiswapStable
+        || DexIndex(functionSelectorIndex) == DexIndex.BancorV3
+    ) {
       swap.data = swap.data.newMantis(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Wombat) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else if (DexIndex(functionSelectorIndex) == DexIndex.iZiSwap) {
       swap.data = swap.data.newIziSwap(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.TraderJoeV2) {
       swap.data = swap.data.newTraderJoeV2(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.WooFiV2) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDSLO) {
-      revert('InputScalingHelper: Can not scale KyberDSLO swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.LevelFiV2) {
       swap.data = swap.data.newLevelFiV2(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.PancakeStableSwap) {
-      swap.data = swap.data.newCurveSwap(oldAmount, newAmount); // @dev same encoded data as Curve
     } else if (DexIndex(functionSelectorIndex) == DexIndex.GMXGLP) {
       swap.data = swap.data.newGMXGLP(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Vooi) {
       swap.data = swap.data.newVooi(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.VelocoreV2) {
       swap.data = swap.data.newVelocoreV2(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Smardex) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.SolidlyV2) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Kokonut) {
       swap.data = swap.data.newKokonut(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.BalancerV1) {
       swap.data = swap.data.newBalancerV1(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.SwaapV2) {
-      revert('InputScalingHelper: Can not scale SwaapV2 swap');
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.NomiswapStable) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else if (DexIndex(functionSelectorIndex) == DexIndex.ArbswapStable) {
       swap.data = swap.data.newArbswapStable(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.BancorV2) {
       swap.data = swap.data.newBancorV2(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.BancorV3) {
-      swap.data = swap.data.newMantis(oldAmount, newAmount); // @dev use identical calldata structure as Mantis
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Ambient) {
       swap.data = swap.data.newAmbient(oldAmount, newAmount);
-    } else if (DexIndex(functionSelectorIndex) == DexIndex.Native) {
-      revert('InputScalingHelper: Can not scale Native swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.LighterV2) {
       swap.data = swap.data.newLighterV2(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.Bebop) {
-      revert('InputScalingHelper: Can not scale Bebop swap');
+      swap.data = swap.data.newBebop(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.SwaapV2) {
+      revert('InputScalingHelper: Can not scale SwaapV2 swap');
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberLO) {
+      revert('InputScalingHelper: Can not scale KyberLO swap');
     } else if (DexIndex(functionSelectorIndex) == DexIndex.MaiPSM) {
       swap.data = swap.data.newMaiPSM(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Native) {
+      swap.data = swap.data.newNative(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberDSLO) {
+      swap.data = swap.data.newDSLO(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Hashflow) {
+      swap.data = swap.data.newHashflow(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.RFQ) {
+      swap.data = swap.data.newKyberRFQ(oldAmount, newAmount);
     } else {
       revert('InputScaleHelper: Dex type not supported');
     }
