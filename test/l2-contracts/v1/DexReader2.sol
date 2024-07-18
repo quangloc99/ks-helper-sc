@@ -71,7 +71,7 @@ contract DexReader2 is Common {
     bool isFirstDex,
     address nextPool,
     bool getPoolOnly
-  ) public returns (bytes memory) {
+  ) public view returns (bytes memory) {
     uint256 startByte = 0;
     IExecutorHelperL2.UniswapV3KSElastic memory swap;
     // decode

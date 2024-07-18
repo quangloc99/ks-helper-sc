@@ -231,37 +231,21 @@ library CalldataReader {
     uint256 startByte
   ) internal pure returns (IKyberLO.Order memory orders, uint256) {
     (orders.salt, startByte) = _readUint128AsUint256(data, startByte);
-
     (orders.makerAsset, startByte) = _readAddress(data, startByte);
-
     (orders.takerAsset, startByte) = _readAddress(data, startByte);
-
     (orders.maker, startByte) = _readAddress(data, startByte);
-
     (orders.receiver, startByte) = _readAddress(data, startByte);
-
     (orders.allowedSender, startByte) = _readAddress(data, startByte);
-
     (orders.makingAmount, startByte) = _readUint128AsUint256(data, startByte);
-
     (orders.takingAmount, startByte) = _readUint128AsUint256(data, startByte);
-
     (orders.feeRecipient, startByte) = _readAddress(data, startByte);
-
     (orders.makerTokenFeePercent, startByte) = _readUint32(data, startByte);
-
     (orders.makerAssetData, startByte) = _readBytes(data, startByte);
-
     (orders.takerAssetData, startByte) = _readBytes(data, startByte);
-
     (orders.getMakerAmount, startByte) = _readBytes(data, startByte);
-
     (orders.getTakerAmount, startByte) = _readBytes(data, startByte);
-
     (orders.predicate, startByte) = _readBytes(data, startByte);
-
     (orders.permit, startByte) = _readBytes(data, startByte);
-
     (orders.interaction, startByte) = _readBytes(data, startByte);
     return (orders, startByte);
   }

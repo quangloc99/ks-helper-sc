@@ -31,50 +31,51 @@ contract InputScalingHelperL2 {
     KyberDMM,
     Velodrome,
     Fraxswap,
-    Camelot, // 4
+    Camelot,
+    KyberLimitOrder, // 5
+    KyberRFQ, // 6
+    Hashflow, // 7
     StableSwap,
     Curve,
     UniswapV3KSElastic,
     BalancerV2,
-    DODO, // 9
+    DODO,
     GMX,
     Synthetix,
     wstETH,
     stETH,
-    Platypus, // 14
+    Platypus,
     PSM,
     Maverick,
     SyncSwap,
     AlgebraV1,
-    BalancerBatch, // 19
+    BalancerBatch,
     Mantis,
     Wombat,
     WooFiV2,
     iZiSwap,
-    TraderJoeV2, // 24
+    TraderJoeV2, // 27
+    KyberDSLO, // 28
     LevelFiV2,
     GMXGLP,
     PancakeStableSwap,
     Vooi,
-    VelocoreV2, // 29
+    VelocoreV2,
     Smardex,
     SolidlyV2,
     Kokonut,
-    BalancerV1,
-    SwaapV2, // 34
+    BalancerV1, // 37
+    SwaapV2,
     NomiswapStable,
     ArbswapStable,
     BancorV3,
     BancorV2,
-    Ambient, // 39
-    Native,
+    Ambient,
+    Native, // 44
     LighterV2,
-    Bebop,
-    MaiPSM,
-    Hashflow, // 44
-    KyberDSLO,
-    KyberRFQ,
-    KyberLimitOrder // 47
+    Bebop, // 46
+    MantleUsd,
+    MaiPSM // 48
 
   }
 
@@ -339,6 +340,8 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newHashflow(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.KyberRFQ) {
       swap.data = swap.data.newKyberRFQ(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.MantleUsd) {
+      swap.data = swap.data.newMantleUsd(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.SwaapV2) {
       revert('InputScalingHelper: Can not scale SwaapV2 swap');
     } else {

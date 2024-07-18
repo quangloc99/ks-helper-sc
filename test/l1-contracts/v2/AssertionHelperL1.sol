@@ -604,7 +604,7 @@ contract AssertionHelperL1 is Test {
     assertEq(dexStructData.params.takingAmount, mockParams.amount * newAmount / oldAmount);
   }
 
-  function excludeSighash(bytes calldata rawData) external returns (bytes memory) {
+  function excludeSighash(bytes calldata rawData) external pure returns (bytes memory) {
     return rawData[4:];
   }
 }
