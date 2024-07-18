@@ -73,6 +73,7 @@ contract TestDataWriter is AssertionHelper {
 
   function _createMockSwapExecutorDescription()
     internal
+    view
     returns (IExecutorL2.SwapExecutorDescription memory desc)
   {
     desc.tokenIn = mockParams.srcToken;
@@ -180,6 +181,8 @@ contract TestDataWriter is AssertionHelper {
       fn = _createNative;
     } else if (dexType == InputScalingHelperL2.DexIndex.Bebop) {
       fn = _createBebop;
+    } else if (dexType == InputScalingHelperL2.DexIndex.MantleUsd) {
+      fn = _createMantleUsd;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -642,5 +645,16 @@ contract TestDataWriter is AssertionHelper {
     IExecutorHelperL2.Bebop memory data;
     data.amount = uint128(mockParams.amount);
     swap.data = writer.writeBebop({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
+  }
+
+  function _createMantleUsd(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
+    uint256 isWrapAndAmount;
+    isWrapAndAmount |= uint256(uint128(mockParams.amount));
+    isWrapAndAmount |= uint256(1) << 255;
+    swap.data = abi.encode(isWrapAndAmount);
   }
 }

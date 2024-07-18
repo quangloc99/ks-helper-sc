@@ -575,6 +575,22 @@ contract DexScalersTest is Test {
     assertEq(swapScaled.amount, tmpAmount / oldAmount, 'results are not eq');
   }
 
+  function test_scaleMantleUsd(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+
+    uint128 swapAmount = oldAmount;
+
+    bytes memory compressed = writer.writeMantleUsd(true, oldAmount);
+    bytes memory scaled = compressed.newMantleUsd(oldAmount, newAmount);
+
+    uint256 isWrapAndAmount = abi.decode(scaled, (uint256));
+
+    uint256 tmpAmount = uint256(swapAmount) * uint256(newAmount); // handle phantom overflow
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(uint256(uint128(isWrapAndAmount)), tmpAmount / oldAmount, 'results are not eq');
+  }
+
   function test_scaleHashflow(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
     // _assumeConditions(oldAmount, newAmount, recipientFlag);
 

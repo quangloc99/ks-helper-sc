@@ -3,11 +3,11 @@ pragma solidity 0.8.25;
 
 contract BaseConfig {
   enum DexName {
-    Native,
+    SwaapV2, // 0
+    Bebop, // 1
+    Native, // 2
     KyberLO,
     KyberDSLO,
-    SwaapV2,
-    Bebop,
     UNI,
     KyberDMM,
     Velodrome,

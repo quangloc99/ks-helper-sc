@@ -67,7 +67,7 @@ contract InputScalingHelperV2 is Ownable {
   function getScaledInputData(
     bytes calldata inputData,
     uint256 newAmount
-  ) external view returns (bytes memory) {
+  ) external view returns (bool isSuccess, bytes memory data) {
     bytes4 selector = bytes4(inputData[:4]);
     bytes calldata dataToDecode = inputData[4:];
 
@@ -75,11 +75,12 @@ contract InputScalingHelperV2 is Ownable {
       IMetaAggregationRouterV2.SwapExecutionParams memory params =
         abi.decode(dataToDecode, (IMetaAggregationRouterV2.SwapExecutionParams));
 
-      (params.desc, params.targetData) = _getScaledInputDataV2(
+      (isSuccess, params.desc, params.targetData) = _getScaledInputDataV2(
         params.desc, params.targetData, newAmount, _flagsChecked(params.desc.flags, _SIMPLE_SWAP)
       );
 
-      return abi.encodeWithSelector(selector, params);
+      if (!isSuccess) return (false, '');
+      return (true, abi.encodeWithSelector(selector, params));
     } else if (selector == IMetaAggregationRouterV2.swapSimpleMode.selector) {
       (
         address callTarget,
@@ -90,10 +91,11 @@ contract InputScalingHelperV2 is Ownable {
         dataToDecode, (address, IMetaAggregationRouterV2.SwapDescriptionV2, bytes, bytes)
       );
 
-      (desc, targetData) = _getScaledInputDataV2(desc, targetData, newAmount, true);
-      return abi.encodeWithSelector(selector, callTarget, desc, targetData, clientData);
+      (isSuccess, desc, targetData) = _getScaledInputDataV2(desc, targetData, newAmount, true);
+      if (!isSuccess) return (false, '');
+      return (true, abi.encodeWithSelector(selector, callTarget, desc, targetData, clientData));
     } else {
-      revert('InputScalingHelper: Invalid selector');
+      return (false, '');
     }
   }
 
@@ -102,25 +104,31 @@ contract InputScalingHelperV2 is Ownable {
     bytes memory executorData,
     uint256 newAmount,
     bool isSimpleMode
-  ) internal view returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory, bytes memory) {
+  )
+    internal
+    view
+    returns (
+      bool isSuccess,
+      IMetaAggregationRouterV2.SwapDescriptionV2 memory sDescription,
+      bytes memory exCallData
+    )
+  {
     uint256 oldAmount = desc.amount;
     if (oldAmount == newAmount) {
-      return (desc, executorData);
+      return (true, desc, executorData);
     }
 
     // simple mode swap
     if (isSimpleMode) {
-      return (
-        _scaledSwapDescriptionV2(desc, oldAmount, newAmount),
-        _scaledSimpleSwapData(executorData, oldAmount, newAmount)
-      );
+      (isSuccess, exCallData) = _scaledSimpleSwapData(executorData, oldAmount, newAmount);
+      if (!isSuccess) return (false, sDescription, '');
+      return (isSuccess, _scaledSwapDescriptionV2(desc, oldAmount, newAmount), exCallData);
     }
 
+    (isSuccess, exCallData) = _scaledExecutorCallBytesData(executorData, oldAmount, newAmount);
+    if (!isSuccess) return (false, sDescription, '');
     //normal mode swap
-    return (
-      _scaledSwapDescriptionV2(desc, oldAmount, newAmount),
-      _scaledExecutorCallBytesData(executorData, oldAmount, newAmount)
-    );
+    return (isSuccess, _scaledSwapDescriptionV2(desc, oldAmount, newAmount), exCallData);
   }
 
   /// @dev Scale the swap description
@@ -128,7 +136,7 @@ contract InputScalingHelperV2 is Ownable {
     IMetaAggregationRouterV2.SwapDescriptionV2 memory desc,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal view returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory) {
+  ) internal pure returns (IMetaAggregationRouterV2.SwapDescriptionV2 memory) {
     desc.minReturnAmount = (desc.minReturnAmount * newAmount) / oldAmount;
     if (desc.minReturnAmount == 0) desc.minReturnAmount = 1;
     desc.amount = newAmount;
@@ -149,7 +157,7 @@ contract InputScalingHelperV2 is Ownable {
     bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal pure returns (bytes memory) {
+  ) internal pure returns (bool isSuccess, bytes memory) {
     SimpleSwapData memory swapData = abi.decode(data, (SimpleSwapData));
 
     uint256 nPools = swapData.firstPools.length;
@@ -159,9 +167,11 @@ contract InputScalingHelperV2 is Ownable {
         ++i;
       }
     }
-    swapData.positiveSlippageData =
+    (isSuccess, swapData.positiveSlippageData) =
       _scaledPositiveSlippageFeeData(swapData.positiveSlippageData, oldAmount, newAmount);
-    return abi.encode(swapData);
+
+    if (!isSuccess) return (false, '');
+    return (isSuccess, abi.encode(swapData));
   }
 
   /// @dev Scale the executorData in case normal swap
@@ -169,10 +179,10 @@ contract InputScalingHelperV2 is Ownable {
     bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal view returns (bytes memory) {
+  ) internal view returns (bool isSuccess, bytes memory) {
     SwapExecutorDescription memory executorDesc = abi.decode(data, (SwapExecutorDescription));
 
-    executorDesc.positiveSlippageData =
+    (isSuccess, executorDesc.positiveSlippageData) =
       _scaledPositiveSlippageFeeData(executorDesc.positiveSlippageData, oldAmount, newAmount);
 
     uint256 nSequences = executorDesc.swapSequences.length;
@@ -182,14 +192,14 @@ contract InputScalingHelperV2 is Ownable {
       bytes4 functionSelector = bytes4(swap.selectorAndFlags);
 
       address helper = helperOf[functionSelector];
-      require(helper != address(0), "InputScalingHelper: Helper for dex doesn't existed");
+      if (helper == address(0)) return (false, '');
 
       (bool success, bytes memory returnData) = helper.staticcall(
         abi.encodeWithSelector(functionSelector, abi.encode(swap.data, oldAmount, newAmount), 0)
       );
 
       if (!success) {
-        revert(RevertReasonParser.parse(returnData, 'InputScalingHelper call failed: '));
+        return (false, '');
       }
 
       swap.data = abi.decode(returnData, (bytes));
@@ -199,30 +209,30 @@ contract InputScalingHelperV2 is Ownable {
       }
     }
 
-    return abi.encode(executorDesc);
+    return (true, abi.encode(executorDesc));
   }
 
   function _scaledPositiveSlippageFeeData(
     bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
-  ) internal pure returns (bytes memory newData) {
+  ) internal pure returns (bool isSuccess, bytes memory newData) {
     if (data.length > 32) {
       PositiveSlippageFeeData memory psData = abi.decode(data, (PositiveSlippageFeeData));
       uint256 left = uint256(psData.expectedReturnAmount >> 128);
       uint256 right = uint256(uint128(psData.expectedReturnAmount)) * newAmount / oldAmount;
-      require(right <= type(uint128).max, 'Exceeded type range');
+      if (right > type(uint128).max) return (false, '');
       psData.expectedReturnAmount = right | left << 128;
-      data = abi.encode(psData);
+      newData = abi.encode(psData);
     } else if (data.length == 32) {
       uint256 expectedReturnAmount = abi.decode(data, (uint256));
       uint256 left = uint256(expectedReturnAmount >> 128);
       uint256 right = uint256(uint128(expectedReturnAmount)) * newAmount / oldAmount;
-      require(right <= type(uint128).max, 'Exceeded type range');
+      if (right > type(uint128).max) return (false, '');
       expectedReturnAmount = right | left << 128;
-      data = abi.encode(expectedReturnAmount);
+      newData = abi.encode(expectedReturnAmount);
     }
-    return data;
+    return (true, newData);
   }
 
   function _flagsChecked(uint256 number, uint256 flag) internal pure returns (bool) {

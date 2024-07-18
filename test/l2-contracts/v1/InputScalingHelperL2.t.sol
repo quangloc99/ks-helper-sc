@@ -67,6 +67,9 @@ contract InputScalingHelperL2Test is TestDataWriter {
   ) public {
     _assumeConditions(oldAmount, newAmount, minReturnAmount, recipientFlag);
     _assumeDexType(dexType, true);
+
+    console.log('dexType');
+    console.log(dexType);
     vm.assume(noSequences > 0 && noSequences < 3);
 
     mockParams.amount = oldAmount;

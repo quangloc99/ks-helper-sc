@@ -698,4 +698,24 @@ library DexScaler {
 
     return data.writeBytes(startByte, txData);
   }
+
+  function scaleMantleUsd(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    (uint256 isWrapAndAmount,) = data._readUint256(0);
+
+    bool _isWrap = isWrapAndAmount >> 255 == 1;
+    uint256 _amount = uint256(uint128(isWrapAndAmount));
+
+    //scale amount
+    _amount = oldAmount == 0 ? 0 : (_amount * newAmount) / oldAmount;
+
+    // reset and create new variable for isWrap and amount
+    isWrapAndAmount = 0;
+    isWrapAndAmount |= uint256(uint128(_amount));
+    isWrapAndAmount |= uint256(_isWrap ? 1 : 0) << 255;
+    return abi.encode(isWrapAndAmount);
+  }
 }

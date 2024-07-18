@@ -11,7 +11,7 @@ import {DexHelper01} from 'src/helpers/DexHelper01.sol';
 import {TestL1DataWriter as TestDataWriter} from './TestL1DataWriter.sol';
 import {BaseConfig} from './BaseConfig.sol';
 
-contract InputScalingHelperL1Test is TestDataWriter {
+contract InputScalingHelperV2Test is TestDataWriter {
   InputScalingHelperV2 scaleHelper = new InputScalingHelperV2();
   DexHelper01 dexHelper1 = new DexHelper01();
   uint16 DEX_NUM;
@@ -128,17 +128,10 @@ contract InputScalingHelperL1Test is TestDataWriter {
     vm.assume(dexName <= uint8(type(BaseConfig.DexName).max));
 
     if (excludeNotSupported) {
-      vm.assume(
-        BaseConfig.DexName(dexName) != BaseConfig.DexName.Bebop
-          && BaseConfig.DexName(dexName) != BaseConfig.DexName.SwaapV2
-          && BaseConfig.DexName(dexName) != BaseConfig.DexName.Native // can't mock test with mock data, but we can scale
-      );
+      // can't mock test with mock data, but we can scale
+      vm.assume(dexName > 2);
     } else {
-      vm.assume(
-        BaseConfig.DexName(dexName) == BaseConfig.DexName.Bebop
-          || BaseConfig.DexName(dexName) == BaseConfig.DexName.SwaapV2
-          || BaseConfig.DexName(dexName) == BaseConfig.DexName.Native // can't mock test with mock data, but we can scale
-      );
+      vm.assume(dexName < 2);
     }
   }
 
@@ -171,12 +164,14 @@ contract InputScalingHelperL1Test is TestDataWriter {
       IMetaAggregationRouterV2.swap.selector, _createMockSwapExecutionParams({simpleMode: false})
     );
 
-    bytes memory scaledData = scaleHelper.getScaledInputData(rawData, newAmount);
+    (bool isSuccess, bytes memory scaledData) = scaleHelper.getScaledInputData(rawData, newAmount);
+
+    assertEq(isSuccess, true);
 
     _assertScaledData(rawData, scaledData, oldAmount, newAmount, false);
   }
 
-  function test_revert_swapNormalMode(
+  function test_fail_swapNormalMode(
     uint128 oldAmount,
     uint128 newAmount,
     uint128 minReturnAmount,
@@ -206,9 +201,8 @@ contract InputScalingHelperL1Test is TestDataWriter {
       IMetaAggregationRouterV2.swap.selector, _createMockSwapExecutionParams({simpleMode: false})
     );
 
-    vm.expectRevert();
-
-    scaleHelper.getScaledInputData(rawData, newAmount);
+    (bool isSuccess,) = scaleHelper.getScaledInputData(rawData, newAmount);
+    assertEq(isSuccess, false);
   }
 
   function test_swapSimpleMode(
@@ -247,7 +241,10 @@ contract InputScalingHelperL1Test is TestDataWriter {
       exec.clientData
     );
 
-    bytes memory scaledRawData = scaleHelper.getScaledInputData(rawData, newAmount);
+    (bool isSuccess, bytes memory scaledRawData) =
+      scaleHelper.getScaledInputData(rawData, newAmount);
+
+    assertEq(isSuccess, true);
 
     _assertScaledData(rawData, scaledRawData, oldAmount, newAmount, true);
   }

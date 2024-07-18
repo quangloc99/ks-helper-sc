@@ -598,6 +598,16 @@ contract DexWriter {
     shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
   }
 
+  function writeMantleUsd(
+    bool isWrap,
+    uint256 amount
+  ) external pure returns (bytes memory shortData) {
+    uint256 isWrapAndAmount;
+    isWrapAndAmount |= uint256(uint128(amount));
+    isWrapAndAmount |= uint256(isWrap ? 1 : 0) << 255;
+    shortData = bytes.concat(shortData, bytes32(abi.encode(isWrapAndAmount)));
+  }
+
   function writeHashflow(
     IExecutorHelperL2.Hashflow memory swap,
     uint256 poolIndex,

@@ -66,7 +66,7 @@ contract AssertionHelper is Test {
       for (uint256 i; i < simpleSwapData.firstPools.length; ++i) {
         // check first swap amounts scaled properly
         assertEq(simpleSwapData.firstSwapAmounts[i], mockParams.amount * newAmount / oldAmount);
-        (IExecutorL2.Swap[] memory swaps, address tokenIn) =
+        (IExecutorL2.Swap[] memory swaps,) =
           ExecutorReader.readSwapSingleSequence(simpleSwapData.swapDatas[i]);
 
         // check scaled data for first dex
@@ -693,7 +693,7 @@ contract AssertionHelper is Test {
     assertEq(data.params.takingAmount, mockParams.amount * newAmount / oldAmount);
   }
 
-  function excludeSighash(bytes calldata rawData) external returns (bytes memory) {
+  function excludeSighash(bytes calldata rawData) external pure returns (bytes memory) {
     return rawData[4:];
   }
 }
