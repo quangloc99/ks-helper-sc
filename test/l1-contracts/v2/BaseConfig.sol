@@ -72,6 +72,7 @@ contract BaseConfig {
     MantleUsd,
     BedrockUniETH,
     MaiPSM,
-    PufferFinance
+    PufferFinance,
+    SymbioticLRT
   }
 }

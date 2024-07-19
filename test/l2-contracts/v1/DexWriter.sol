@@ -820,6 +820,30 @@ contract DexWriter {
     shortData = bytes.concat(shortData, bytes20(swap.recipient));
   }
 
+  function writeSymbioticLRT(
+    IExecutorHelperL2.SymbioticLRT memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex,
+    uint8 recipientFlag
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.vault));
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
+    else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
+
+    shortData = bytes.concat(shortData, bytes20(swap.tokenIn));
+
+    if (recipientFlag == 1 || recipientFlag == 2) {
+      shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    } else {
+      shortData = bytes.concat(shortData, bytes1(uint8(0)));
+      shortData = bytes.concat(shortData, bytes20(swap.recipient));
+    }
+
+    shortData = bytes.concat(shortData, bytes1(swap.isVer0 ? 1 : 0));
+  }
+
   /*
    ************************ Utility ************************
    */

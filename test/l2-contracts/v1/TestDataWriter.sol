@@ -183,6 +183,8 @@ contract TestDataWriter is AssertionHelper {
       fn = _createBebop;
     } else if (dexType == InputScalingHelperL2.DexIndex.MantleUsd) {
       fn = _createMantleUsd;
+    } else if (dexType == InputScalingHelperL2.DexIndex.SymbioticLRT) {
+      fn = _createSymbioticLRT;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -656,5 +658,20 @@ contract TestDataWriter is AssertionHelper {
     isWrapAndAmount |= uint256(uint128(mockParams.amount));
     isWrapAndAmount |= uint256(1) << 255;
     swap.data = abi.encode(isWrapAndAmount);
+  }
+
+  function _createSymbioticLRT(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
+    IExecutorHelperL2.SymbioticLRT memory data;
+    data.amount = mockParams.amount;
+    swap.data = writer.writeSymbioticLRT({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
   }
 }

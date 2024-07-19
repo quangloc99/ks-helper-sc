@@ -718,4 +718,19 @@ library DexScaler {
     isWrapAndAmount |= uint256(_isWrap ? 1 : 0) << 255;
     return abi.encode(isWrapAndAmount);
   }
+
+  function scaleSymbioticLRT(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // vault
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleSymbioticLRT'
+    );
+  }
 }

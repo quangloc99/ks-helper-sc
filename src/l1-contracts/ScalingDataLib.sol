@@ -613,4 +613,15 @@ library ScalingDataLib {
 
     return abi.encode(structData);
   }
+
+  function newSymbioticLRT(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    IExecutorHelperStruct.SymbioticLRT memory structData =
+      abi.decode(data, (IExecutorHelperStruct.SymbioticLRT));
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
 }

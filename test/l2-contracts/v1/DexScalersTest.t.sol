@@ -724,4 +724,21 @@ contract DexScalersTest is Test {
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.params.takingAmount, tmpAmount / oldAmount, 'results are not eq');
   }
+
+  function test_scaleSymbioticLRT(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2Struct.SymbioticLRT memory swap;
+    swap.amount = oldAmount;
+
+    bytes memory compressed = writer.writeSymbioticLRT(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newSymbioticLRT(oldAmount, newAmount);
+
+    IExecutorHelperL2Struct.SymbioticLRT memory swapScaled = abi.decode(
+      reader.readSymbioticLRT(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2Struct.SymbioticLRT)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
+  }
 }
