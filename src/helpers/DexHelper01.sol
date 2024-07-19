@@ -823,4 +823,17 @@ contract DexHelper01 {
 
     return abi.encode(structData);
   }
+
+  function executeSymbioticLRT(
+    bytes memory scalingData,
+    uint256 /*  */
+  ) public pure returns (bytes memory) {
+    (bytes memory data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    IExecutorHelperStruct.SymbioticLRT memory structData =
+      abi.decode(data, (IExecutorHelperStruct.SymbioticLRT));
+    structData.amount = (structData.amount * newAmount) / oldAmount;
+    return abi.encode(structData);
+  }
 }

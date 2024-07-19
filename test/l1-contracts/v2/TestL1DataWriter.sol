@@ -215,6 +215,8 @@ contract TestL1DataWriter is AssertionHelperL1 {
       fn = _createKyberLO;
     } else if (dexName == BaseConfig.DexName.KyberDSLO) {
       fn = _createKyberDSLO;
+    } else if (dexName == BaseConfig.DexName.SymbioticLRT) {
+      fn = _createSymbioticLRT;
     } else {
       // bebop, swaapv2
       swap.data = bytes('mock data');
@@ -656,5 +658,13 @@ contract TestL1DataWriter is AssertionHelperL1 {
     swap.data = abi.encode(dexStructData);
 
     swap.selectorAndFlags = bytes32(IExecutorHelper.executeKyberDSLO.selector);
+  }
+
+  function _createSymbioticLRT() internal view returns (IExecutorL1.Swap memory swap) {
+    IExecutorHelperStruct.SymbioticLRT memory dexStructData;
+    dexStructData.amount = mockParams.amount;
+    swap.data = abi.encode(dexStructData);
+
+    swap.selectorAndFlags = bytes32(IExecutorHelper.executeSymbioticLRT.selector);
   }
 }

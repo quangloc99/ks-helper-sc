@@ -11,13 +11,13 @@ import {DexHelper01} from 'src/helpers/DexHelper01.sol';
 import {TestL1DataWriter as TestDataWriter} from './TestL1DataWriter.sol';
 import {BaseConfig} from './BaseConfig.sol';
 
-contract InputScalingHelperV2Test is TestDataWriter {
+contract InputScalingHelperL1V2Test is TestDataWriter {
   InputScalingHelperV2 scaleHelper = new InputScalingHelperV2();
   DexHelper01 dexHelper1 = new DexHelper01();
   uint16 DEX_NUM;
 
   function _getFuncSelectorList() internal pure returns (bytes4[] memory funcSelectorList) {
-    funcSelectorList = new bytes4[](68);
+    funcSelectorList = new bytes4[](69);
     funcSelectorList[0] = IExecutorHelper.executeUniswap.selector;
     funcSelectorList[1] = IExecutorHelper.executeStableSwap.selector;
     funcSelectorList[2] = IExecutorHelper.executeCurve.selector;
@@ -86,6 +86,7 @@ contract InputScalingHelperV2Test is TestDataWriter {
     funcSelectorList[65] = IExecutorHelper.executeNative.selector;
     funcSelectorList[66] = IExecutorHelper.executeKyberDSLO.selector;
     funcSelectorList[67] = IExecutorHelper.executeKyberLimitOrder.selector;
+    funcSelectorList[68] = IExecutorHelper.executeSymbioticLRT.selector;
   }
 
   function setUp() public {

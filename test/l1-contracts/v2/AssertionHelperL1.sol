@@ -604,6 +604,16 @@ contract AssertionHelperL1 is Test {
     assertEq(dexStructData.params.takingAmount, mockParams.amount * newAmount / oldAmount);
   }
 
+  function assertSymbioticLRTData(
+    bytes memory dexData,
+    uint256 newAmount,
+    uint256 oldAmount
+  ) internal {
+    IExecutorHelperStruct.SymbioticLRT memory dexStructData =
+      abi.decode(dexData, (IExecutorHelperStruct.SymbioticLRT));
+    assertEq(dexStructData.amount, mockParams.amount * newAmount / oldAmount);
+  }
+
   function excludeSighash(bytes calldata rawData) external pure returns (bytes memory) {
     return rawData[4:];
   }

@@ -10,7 +10,7 @@ import {IAggregationExecutorOptimistic as IExecutorL2} from
 import {Reader} from './DexScalersTest.t.sol';
 import {TestDataWriter} from './TestDataWriter.sol';
 
-contract InputScalingHelperL2Test is TestDataWriter {
+contract InputScalingHelperL2V1Test is TestDataWriter {
   InputScalingHelperL2 helper = new InputScalingHelperL2();
 
   function setUp() public {

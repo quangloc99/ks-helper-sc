@@ -204,6 +204,8 @@ contract AssertionHelper is Test {
       fn = assertKyberRfq;
     } else if (dexType == InputScalingHelperL2.DexIndex.Hashflow) {
       fn = assertHashflow;
+    } else if (dexType == InputScalingHelperL2.DexIndex.SymbioticLRT) {
+      fn = assertSymbioticLRTData;
     } else {
       fn = assertNothing;
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
@@ -691,6 +693,24 @@ contract AssertionHelper is Test {
       abi.decode(depacked, (IExecutorHelperL2Struct.KyberLimitOrder));
 
     assertEq(data.params.takingAmount, mockParams.amount * newAmount / oldAmount);
+  }
+
+  function assertSymbioticLRTData(
+    bytes memory dexData,
+    uint256 newAmount,
+    uint256 oldAmount
+  ) internal {
+    bytes memory depacked = reader.readSymbioticLRT({
+      data: dexData,
+      tokenIn: mockParams.srcToken,
+      isFirstDex: true,
+      nextPool: MOCK_ADDRESS,
+      getPoolOnly: false
+    });
+    IExecutorHelperL2Struct.SymbioticLRT memory data =
+      abi.decode(depacked, (IExecutorHelperL2Struct.SymbioticLRT));
+
+    assertEq(data.amount, mockParams.amount * newAmount / oldAmount);
   }
 
   function excludeSighash(bytes calldata rawData) external pure returns (bytes memory) {

@@ -378,4 +378,12 @@ interface IExecutorHelperL2Struct {
     address takerAsset;
     IKyberLO.FillBatchOrdersParams params;
   }
+
+  struct SymbioticLRT {
+    address vault;
+    uint256 amount;
+    address tokenIn;
+    address recipient;
+    bool isVer0;
+  }
 }
