@@ -3,11 +3,11 @@ pragma solidity 0.8.25;
 
 import {Test, console} from 'forge-std/Test.sol';
 import {InputScalingHelperL2} from 'src/l2-contracts/InputScalingHelperL2.sol';
-import {DexWriter} from './DexWriter.sol';
+import {DexWriter} from 'test/l2-contracts/base/DexWriter.sol';
 import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 import {IAggregationExecutorOptimistic as IExecutorL2} from
   'src/interfaces/IAggregationExecutorOptimistic.sol';
-import {Reader} from './DexScalersTest.t.sol';
+import {Reader} from 'test/l2-contracts/base/DexScalersTest.t.sol';
 import {TestDataWriter} from './TestDataWriter.sol';
 
 contract InputScalingHelperL2V1Test is TestDataWriter {
@@ -92,36 +92,6 @@ contract InputScalingHelperL2V1Test is TestDataWriter {
     _assertScaledData(rawData, scaledRawData, oldAmount, newAmount, false);
   }
 
-  // function test_revert_swapNormalMode(
-  //   uint128 oldAmount,
-  //   uint128 newAmount,
-  //   uint128 minReturnAmount,
-  //   uint8 recipientFlag,
-  //   uint8 dexType
-  // ) public {
-  //   _assumeConditions(oldAmount, newAmount, minReturnAmount, recipientFlag);
-  //   _assumeDexType(dexType, false);
-  //   vm.assume(oldAmount != newAmount);
-
-  //   mockParams.amount = oldAmount;
-  //   mockParams.minReturnAmount = minReturnAmount;
-  //   mockParams.recipientFlag = recipientFlag;
-  //   mockParams.noSequences = 2;
-
-  //   for (uint256 i; i < mockParams.noSequences; ++i) {
-  //     mockParams.swapSequences.push();
-  //     mockParams.swapSequences[i].push(_createDexData(InputScalingHelperL2.DexIndex(dexType), 0));
-  //     mockParams.swapSequences[i].push(_createDexData(InputScalingHelperL2.DexIndex(dexType), 1));
-  //   }
-
-  //   bytes memory rawData = abi.encodeWithSelector(
-  //     IMetaAggregationRouterV2.swap.selector, _createMockSwapExecutionParams(false)
-  //   );
-
-  //   vm.expectRevert();
-  //   helper.getScaledInputData(rawData, newAmount);
-  // }
-
   function test_swapSimpleMode(
     uint128 oldAmount,
     uint128 newAmount,
@@ -160,40 +130,4 @@ contract InputScalingHelperL2V1Test is TestDataWriter {
 
     _assertScaledData(rawData, scaledRawData, oldAmount, newAmount, true);
   }
-
-  // function test_revert_swapSimpleMode(
-  //   uint128 oldAmount,
-  //   uint128 newAmount,
-  //   uint128 minReturnAmount,
-  //   uint8 recipientFlag,
-  //   uint8 dexType
-  // ) public {
-  //   _assumeConditions(oldAmount, newAmount, minReturnAmount, recipientFlag);
-  //   _assumeDexType(dexType, false);
-  //   vm.assume(oldAmount != newAmount);
-
-  //   mockParams.amount = oldAmount;
-  //   mockParams.minReturnAmount = minReturnAmount;
-  //   mockParams.recipientFlag = recipientFlag;
-  //   mockParams.noSequences = 2;
-
-  //   for (uint256 i; i < mockParams.noSequences; ++i) {
-  //     mockParams.swapSequences.push();
-  //     mockParams.swapSequences[i].push(_createDexData(InputScalingHelperL2.DexIndex(dexType), 0));
-  //     mockParams.swapSequences[i].push(_createDexData(InputScalingHelperL2.DexIndex(dexType), 1));
-  //   }
-
-  //   IMetaAggregationRouterV2.SwapExecutionParams memory exec = _createMockSwapExecutionParams(true);
-  //   bytes memory rawData = abi.encodeWithSelector(
-  //     IMetaAggregationRouterV2.swapSimpleMode.selector,
-  //     exec.callTarget,
-  //     exec.desc,
-  //     exec.targetData,
-  //     exec.clientData
-  //   );
-
-  //   vm.expectRevert();
-
-  //   helper.getScaledInputData(rawData, newAmount);
-  // }
 }

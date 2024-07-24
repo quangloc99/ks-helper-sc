@@ -7,13 +7,15 @@ import {IAggregationExecutorOptimistic as IExecutorL2} from
   'src/interfaces/IAggregationExecutorOptimistic.sol';
 import {InputScalingHelperL2} from 'src/l2-contracts/InputScalingHelperL2.sol';
 import {DexWriter} from 'test/l2-contracts/base/DexWriter.sol';
-import {AssertionHelper} from './AssertionHelper.sol';
+import {AssertionHelperL2V2} from './AssertionHelperL2V2.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/interfaces/IERC20.sol';
 import {CalldataWriter} from 'src/l2-contracts/CalldataWriter.sol';
 import {IKyberLO} from 'src/interfaces/pools/IKyberLO.sol';
 import {IKyberDSLO} from 'src/interfaces/pools/IKyberDSLO.sol';
+import {BaseConfig} from './BaseConfig.sol';
+import {console} from 'forge-std/Test.sol';
 
-contract TestDataWriter is AssertionHelper {
+contract DataWriterL2V2 is AssertionHelperL2V2 {
   DexWriter writer = new DexWriter();
 
   function _createMockSwapExecutionParams(bool simpleMode)
@@ -87,103 +89,97 @@ contract TestDataWriter is AssertionHelper {
   }
 
   function _createDexData(
-    InputScalingHelperL2.DexIndex dexType,
+    BaseConfig.DexName dexName,
     uint256 sequenceIndex
   ) internal view returns (IExecutorL2.Swap memory swap) {
     function(uint256) internal view returns(IExecutorL2.Swap memory) fn;
 
     if (
-      dexType == InputScalingHelperL2.DexIndex.UNI
-        || dexType == InputScalingHelperL2.DexIndex.KyberDMM
-        || dexType == InputScalingHelperL2.DexIndex.Velodrome
-        || dexType == InputScalingHelperL2.DexIndex.Camelot
-        || dexType == InputScalingHelperL2.DexIndex.Fraxswap
+      dexName == BaseConfig.DexName.UniV1 || dexName == BaseConfig.DexName.KyberDMM
+        || dexName == BaseConfig.DexName.Velodrome || dexName == BaseConfig.DexName.Camelot
+        || dexName == BaseConfig.DexName.Fraxswap
     ) {
       fn = _createUniSwap;
-    } else if (dexType == InputScalingHelperL2.DexIndex.StableSwap) {
+    } else if (dexName == BaseConfig.DexName.StableSwap) {
       fn = _createStableSwap;
     } else if (
-      dexType == InputScalingHelperL2.DexIndex.Curve
-        || dexType == InputScalingHelperL2.DexIndex.PancakeStableSwap
+      dexName == BaseConfig.DexName.Curve || dexName == BaseConfig.DexName.PancakeStableSwap
     ) {
       fn = _createCurveSwap;
-    } else if (dexType == InputScalingHelperL2.DexIndex.UniswapV3KSElastic) {
+    } else if (dexName == BaseConfig.DexName.UniswapV3KSElastic) {
       fn = _createUniswapV3KSElastic;
-    } else if (dexType == InputScalingHelperL2.DexIndex.BalancerV2) {
+    } else if (dexName == BaseConfig.DexName.BalancerV2) {
       fn = _createBalancerV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.DODO) {
+    } else if (dexName == BaseConfig.DexName.DODO) {
       fn = _createDODO;
-    } else if (dexType == InputScalingHelperL2.DexIndex.GMX) {
+    } else if (dexName == BaseConfig.DexName.GMX) {
       fn = _createGMX;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Synthetix) {
+    } else if (dexName == BaseConfig.DexName.Synthetix) {
       fn = _createSynthetix;
-    } else if (dexType == InputScalingHelperL2.DexIndex.wstETH) {
+    } else if (dexName == BaseConfig.DexName.WstETH) {
       fn = _createWrappedstETH;
-    } else if (dexType == InputScalingHelperL2.DexIndex.stETH) {
+    } else if (dexName == BaseConfig.DexName.StETH) {
       fn = _createStETH;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Platypus) {
+    } else if (dexName == BaseConfig.DexName.Platypus) {
       fn = _createPlatypus;
-    } else if (dexType == InputScalingHelperL2.DexIndex.PSM) {
+    } else if (dexName == BaseConfig.DexName.PSM) {
       fn = _createPSM;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Maverick) {
+    } else if (dexName == BaseConfig.DexName.Maverick) {
       fn = _createMaverick;
-    } else if (dexType == InputScalingHelperL2.DexIndex.SyncSwap) {
+    } else if (dexName == BaseConfig.DexName.SyncSwap) {
       fn = _createSyncSwap;
-    } else if (dexType == InputScalingHelperL2.DexIndex.AlgebraV1) {
+    } else if (dexName == BaseConfig.DexName.AlgebraV1) {
       fn = _createAlgebraV1;
-    } else if (dexType == InputScalingHelperL2.DexIndex.BalancerBatch) {
+    } else if (dexName == BaseConfig.DexName.BalancerBatch) {
       fn = _createBalancerBatch;
     } else if (
-      dexType == InputScalingHelperL2.DexIndex.Mantis
-        || dexType == InputScalingHelperL2.DexIndex.Wombat
-        || dexType == InputScalingHelperL2.DexIndex.WooFiV2
-        || dexType == InputScalingHelperL2.DexIndex.Smardex
-        || dexType == InputScalingHelperL2.DexIndex.SolidlyV2
-        || dexType == InputScalingHelperL2.DexIndex.NomiswapStable
-        || dexType == InputScalingHelperL2.DexIndex.BancorV3
+      dexName == BaseConfig.DexName.Mantis || dexName == BaseConfig.DexName.Wombat
+        || dexName == BaseConfig.DexName.WooFiV2 || dexName == BaseConfig.DexName.Smardex
+        || dexName == BaseConfig.DexName.SolidlyV2 || dexName == BaseConfig.DexName.NomiswapStable
+        || dexName == BaseConfig.DexName.BancorV3
     ) {
       fn = _createMantis;
-    } else if (dexType == InputScalingHelperL2.DexIndex.iZiSwap) {
+    } else if (dexName == BaseConfig.DexName.iZiSwap) {
       fn = _createIziSwap;
-    } else if (dexType == InputScalingHelperL2.DexIndex.TraderJoeV2) {
+    } else if (dexName == BaseConfig.DexName.TraderJoeV2) {
       fn = _createTraderJoeV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.LevelFiV2) {
+    } else if (dexName == BaseConfig.DexName.LevelFiV2) {
       fn = _createLevelFiV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.GMXGLP) {
+    } else if (dexName == BaseConfig.DexName.GMXGLP) {
       fn = _createGMXGLP;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Vooi) {
+    } else if (dexName == BaseConfig.DexName.Vooi) {
       fn = _createVooi;
-    } else if (dexType == InputScalingHelperL2.DexIndex.VelocoreV2) {
+    } else if (dexName == BaseConfig.DexName.VelocoreV2) {
       fn = _createVelocoreV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Kokonut) {
+    } else if (dexName == BaseConfig.DexName.Kokonut) {
       fn = _createKokonut;
-    } else if (dexType == InputScalingHelperL2.DexIndex.BalancerV1) {
+    } else if (dexName == BaseConfig.DexName.BalancerV1 || dexName == BaseConfig.DexName.Kelp) {
       fn = _createBalancerV1;
-    } else if (dexType == InputScalingHelperL2.DexIndex.ArbswapStable) {
+    } else if (dexName == BaseConfig.DexName.ArbswapStable) {
       fn = _createArbswapStable;
-    } else if (dexType == InputScalingHelperL2.DexIndex.BancorV2) {
+    } else if (dexName == BaseConfig.DexName.BancorV2) {
       fn = _createBancorV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Ambient) {
+    } else if (dexName == BaseConfig.DexName.Ambient) {
       fn = _createAmbient;
-    } else if (dexType == InputScalingHelperL2.DexIndex.LighterV2) {
+    } else if (dexName == BaseConfig.DexName.LighterV2) {
       fn = _createLighterV2;
-    } else if (dexType == InputScalingHelperL2.DexIndex.MaiPSM) {
+    } else if (dexName == BaseConfig.DexName.MaiPSM) {
       fn = _createMaiPSM;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Hashflow) {
+    } else if (dexName == BaseConfig.DexName.Hashflow) {
       fn = _createHashflow;
-    } else if (dexType == InputScalingHelperL2.DexIndex.KyberLimitOrder) {
+    } else if (dexName == BaseConfig.DexName.KyberLimitOrder) {
       fn = _createKyberLimitOrder;
-    } else if (dexType == InputScalingHelperL2.DexIndex.KyberDSLO) {
+    } else if (dexName == BaseConfig.DexName.KyberDSLO) {
       fn = _createKyberDSLO;
-    } else if (dexType == InputScalingHelperL2.DexIndex.KyberRFQ) {
+    } else if (dexName == BaseConfig.DexName.KyberRFQ) {
       fn = _createKyberRfq;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Native) {
+    } else if (dexName == BaseConfig.DexName.Native) {
       fn = _createNative;
-    } else if (dexType == InputScalingHelperL2.DexIndex.Bebop) {
+    } else if (dexName == BaseConfig.DexName.Bebop) {
       fn = _createBebop;
-    } else if (dexType == InputScalingHelperL2.DexIndex.MantleUsd) {
+    } else if (dexName == BaseConfig.DexName.MantleUsd) {
       fn = _createMantleUsd;
-    } else if (dexType == InputScalingHelperL2.DexIndex.SymbioticLRT) {
+    } else if (dexName == BaseConfig.DexName.SymbioticLRT) {
       fn = _createSymbioticLRT;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
@@ -193,7 +189,7 @@ contract TestDataWriter is AssertionHelper {
 
     swap = fn(sequenceIndex);
 
-    swap.functionSelector = bytes4(uint32(dexType));
+    swap.functionSelector = bytes4(uint32(dexName));
   }
 
   function _nothing(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {}
@@ -592,6 +588,8 @@ contract TestDataWriter is AssertionHelper {
     IExecutorHelperL2.Hashflow memory data;
     data.quote.effectiveBaseTokenAmount = uint128(mockParams.amount);
     swap.data = writer.writeHashflow({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
+
+    console.logBytes(swap.data);
   }
 
   function _createKyberRfq(uint256 sequenceIndex)

@@ -6,7 +6,7 @@ import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.
 import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
 import {IAggregationExecutor as IExecutorL1} from 'src/interfaces/IAggregationExecutor.sol';
 import {InputScalingHelperV2} from 'src/l1-contracts/InputScalingHelperV2.sol';
-import {DexHelper01} from 'src/helpers/DexHelper01.sol';
+import {DexHelper01} from 'src/helpers/l1/DexHelper01.sol';
 
 import {TestL1DataWriter as TestDataWriter} from './TestL1DataWriter.sol';
 import {BaseConfig} from './BaseConfig.sol';
@@ -129,7 +129,7 @@ contract InputScalingHelperL1V2Test is TestDataWriter {
     vm.assume(dexName <= uint8(type(BaseConfig.DexName).max));
 
     if (excludeNotSupported) {
-      // can't mock test with mock data, but we can scale
+      // can't mock test with mock data, but we can scale for value 2 (Native)
       vm.assume(dexName > 2);
     } else {
       vm.assume(dexName < 2);
@@ -249,46 +249,4 @@ contract InputScalingHelperL1V2Test is TestDataWriter {
 
     _assertScaledData(rawData, scaledRawData, oldAmount, newAmount, true);
   }
-
-  // function test_revert_swapSimpleMode(
-  //   uint128 oldAmount,
-  //   uint128 newAmount,
-  //   uint128 minReturnAmount,
-  //   uint8 recipientFlag,
-  //   uint8 dexName,
-  //   uint8 noSequences
-  // ) public {
-  //   _assumeConditions(oldAmount, newAmount, minReturnAmount, recipientFlag);
-  //   _assumeDexName({dexName: dexName, excludeNotSupported: false});
-  //   vm.assume(oldAmount != newAmount);
-
-  //   console.log(dexName);
-  //   vm.assume(noSequences > 0 && noSequences < 3);
-
-  //   mockParams.amount = oldAmount;
-  //   mockParams.minReturnAmount = minReturnAmount;
-  //   mockParams.recipientFlag = recipientFlag;
-  //   mockParams.noSequences = noSequences;
-
-  //   for (uint256 i; i < mockParams.noSequences; ++i) {
-  //     mockParams.swapSequences.push();
-  //     mockParams.swapSequences[i].push(_createDexData(BaseConfig.DexName(dexName)));
-  //     mockParams.swapSequences[i].push(_createDexData(BaseConfig.DexName(dexName)));
-  //   }
-
-  //   IMetaAggregationRouterV2.SwapExecutionParams memory exec =
-  //     _createMockSwapExecutionParams({simpleMode: true});
-
-  //   bytes memory rawData = abi.encodeWithSelector(
-  //     IMetaAggregationRouterV2.swapSimpleMode.selector,
-  //     exec.callTarget,
-  //     exec.desc,
-  //     exec.targetData,
-  //     exec.clientData
-  //   );
-
-  //   vm.expectRevert();
-
-  //   scaleHelper.getScaledInputData(rawData, newAmount);
-  // }
 }
