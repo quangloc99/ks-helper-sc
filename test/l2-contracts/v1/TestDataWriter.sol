@@ -640,13 +640,15 @@ contract TestDataWriter is AssertionHelper {
   {
     IExecutorHelperL2.Native memory data;
     data.amount = uint128(mockParams.amount);
-    swap.data = writer.writeNative({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
+    swap.data =
+      writer.writeNative({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex, recipientFlag: 0});
   }
 
   function _createBebop(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
     IExecutorHelperL2.Bebop memory data;
     data.amount = uint128(mockParams.amount);
-    swap.data = writer.writeBebop({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex});
+    swap.data =
+      writer.writeBebop({swap: data, poolIndex: 0, sequenceIndex: sequenceIndex, recipientFlag: 0});
   }
 
   function _createMantleUsd(uint256 sequenceIndex)

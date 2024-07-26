@@ -39,10 +39,10 @@ library CalldataReader {
     (rfqQuote.externalAccount, startByte) = _readAddress(data, startByte);
     (rfqQuote.trader, startByte) = _readAddress(data, startByte);
     (rfqQuote.effectiveTrader, startByte) = _readAddress(data, startByte);
-    (rfqQuote.baseToken, startByte) = _readAddress(data, startByte);
+    // (rfqQuote.baseToken, startByte) = _readAddress(data, startByte);
     (rfqQuote.quoteToken, startByte) = _readAddress(data, startByte);
-    (rfqQuote.effectiveBaseTokenAmount, startByte) = _readUint128AsUint256(data, startByte);
     ebtaStartByte = startByte;
+    (rfqQuote.effectiveBaseTokenAmount, startByte) = _readUint128AsUint256(data, startByte);
     (rfqQuote.baseTokenAmount, startByte) = _readUint128AsUint256(data, startByte);
     (rfqQuote.quoteTokenAmount, startByte) = _readUint128AsUint256(data, startByte);
     (rfqQuote.quoteExpiry, startByte) = _readUint128AsUint256(data, startByte);

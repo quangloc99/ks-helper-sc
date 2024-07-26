@@ -998,17 +998,25 @@ contract DexHelper01L2 {
 
     uint256 startByte;
     bytes memory strData;
+    uint256 amountStartByte;
     uint256 amount;
     uint256 multihopAndOffset;
     uint256 strDataStartByte;
 
-    (, startByte) = _data._readAddress(startByte); // target
+    (, startByte) = _data._readPool(startByte); // target
+
+    amountStartByte = startByte;
     (amount, startByte) = _data._readUint128AsUint256(startByte); // amount
-    (strData, startByte) = _data._readBytes(startByte); // data
+
     strDataStartByte = startByte;
-    (, startByte) = _data._readAddress(startByte); // tokenIn
+    (strData, startByte) = _data._readBytes(startByte); // data
+
     (, startByte) = _data._readAddress(startByte); // tokenOut
-    (, startByte) = _data._readAddress(startByte); // recipient
+
+    uint8 receipientFlag;
+    (receipientFlag, startByte) = _data._readUint8(startByte); // receipientFlag
+    if (receipientFlag == 0) (, startByte) = _data._readAddress(startByte); // recipient
+
     (multihopAndOffset, startByte) = _data._readUint256(startByte); // multihopAndOffset
 
     require(multihopAndOffset >> 255 == 0, 'Native: Multihop not supported');
@@ -1026,7 +1034,9 @@ contract DexHelper01L2 {
       strData = strData.write32Bytes(amountOutMinOffset, 1, 'ScaleStructDataAmountOutMin');
     }
 
-    return _data.writeBytes(strDataStartByte, strData);
+    _data.write16Bytes(amountStartByte, amount, 'scaleNativeAmount');
+
+    return _data.writeBytes(strDataStartByte + 4, strData); // 4 is strData length
   }
 
   function executeKyberDSLO(
@@ -1045,8 +1055,6 @@ contract DexHelper01L2 {
     (, startByte) = _data._readPool(startByte); // kyberLOAddress
 
     (, startByte) = _data._readAddress(startByte); // makerAsset
-
-    // (, startByte) = data._readAddress(startByte); // don't have takerAsset
 
     (
       IKyberDSLO.FillBatchOrdersParams memory params,
@@ -1080,8 +1088,6 @@ contract DexHelper01L2 {
     (, startByte) = _data._readPool(startByte); // kyberLOAddress
 
     (, startByte) = _data._readAddress(startByte); // makerAsset
-
-    // (, startByte) = data._readAddress(startByte); // takerAsset
 
     (
       IKyberLO.FillBatchOrdersParams memory params,
@@ -1160,27 +1166,32 @@ contract DexHelper01L2 {
     uint256 startByte;
     uint256 amount;
     uint256 amountStartByte;
+    uint256 txDataStartByte;
     bytes memory txData;
 
-    (, startByte) = _data._readAddress(startByte); // pool
+    (, startByte) = _data._readPool(startByte); // pool
 
-    (amount, startByte) = _data._readUint128AsUint256(startByte); // amount
     amountStartByte = startByte;
+    (amount, startByte) = _data._readUint128AsUint256(startByte); // amount
+
+    txDataStartByte = startByte;
     (txData, startByte) = _data._readBytes(startByte); // data
 
     amount = (amount * newAmount) / oldAmount;
 
-    // update calldata with new swap amount
-    (bytes4 selector, bytes memory callData) = txData.splitCalldata();
+    {
+      // update calldata with new swap amount
+      (bytes4 selector, bytes memory callData) = txData.splitCalldata();
 
-    (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
-      abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
+      (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
+        abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
 
-    txData = bytes.concat(bytes4(selector), abi.encode(s, m, amount));
+      txData = bytes.concat(bytes4(selector), abi.encode(s, m, amount));
+    }
 
-    _data.write32Bytes(amountStartByte, amount, 'scaleBebopAmount');
+    _data.write16Bytes(amountStartByte, amount, 'scaleBebopAmount');
 
-    return _data.writeBytes(startByte, txData);
+    return _data.writeBytes(txDataStartByte + 4, txData);
   }
 
   function executeMantleUsd(

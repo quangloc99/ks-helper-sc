@@ -613,20 +613,51 @@ contract DexWriter {
     uint256 poolIndex,
     uint256 sequenceIndex
   ) external pure returns (bytes memory shortData) {
-    shortData = bytes.concat(shortData, bytes20(swap.router));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.pool));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.externalAccount));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.trader));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.effectiveTrader));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.baseToken));
-    shortData = bytes.concat(shortData, bytes20(swap.quote.quoteToken));
+    // shortData = bytes.concat(shortData, bytes20(swap.router));
+    shortData = bytes.concat(shortData, bytes20(0x55084eE0fEf03f14a305cd24286359A35D735151));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.pool));
+    shortData = bytes.concat(shortData, bytes20(0x031903307c517c11B71f8313D19aFDe0a4F41CB5));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.externalAccount));
+    shortData = bytes.concat(shortData, bytes20(0xBB289bC97591F70D8216462DF40ED713011B968a));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.trader));
+    shortData = bytes.concat(shortData, bytes20(address(1)));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.effectiveTrader));
+    shortData = bytes.concat(shortData, bytes20(address(2)));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.baseToken));
+    // shortData = bytes.concat(shortData, bytes20(address(3)));
+
+    // shortData = bytes.concat(shortData, bytes20(swap.quote.quoteToken));
+    shortData = bytes.concat(shortData, bytes20(address(4)));
+
     shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.effectiveBaseTokenAmount)));
-    shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.baseTokenAmount)));
-    shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.quoteTokenAmount)));
-    shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.quoteExpiry)));
-    shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.nonce)));
-    shortData = bytes.concat(shortData, bytes32((swap.quote.txid)));
-    shortData = bytes.concat(shortData, bytes(swap.quote.signature));
+
+    // shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.baseTokenAmount)));
+    shortData = bytes.concat(shortData, bytes16(uint128(5)));
+
+    // shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.quoteTokenAmount)));
+    shortData = bytes.concat(shortData, bytes16(uint128(6)));
+
+    // shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.quoteExpiry)));
+    shortData = bytes.concat(shortData, bytes16(uint128(1702530183)));
+
+    // shortData = bytes.concat(shortData, bytes16(uint128(swap.quote.nonce)));
+    shortData = bytes.concat(shortData, bytes16(uint128(1702530155606)));
+
+    // shortData = bytes.concat(shortData, bytes32((swap.quote.txid)));
+
+    bytes32 txId = 0x1120000ae000ae0000ccac3950a660ffffffffffffff001d084d9d0537630000;
+    shortData = bytes.concat(shortData, txId);
+
+    // shortData = bytes.concat(shortData, bytes(swap.quote.signature));
+    bytes memory signatures =
+      hex'944666bd43459bf84bb3766f1f2b35a7615bf1c630e4aee9fed96754d5efb24765daa0e009faa0b858147ba592c09617bbac8bd14f9f45993d45b184a7635eba1c';
+    shortData = bytes.concat(shortData, bytes4(uint32(signatures.length)));
+    shortData = bytes.concat(shortData, signatures);
   }
 
   function writeKyberRFQ(
@@ -784,40 +815,57 @@ contract DexWriter {
   function writeNative(
     IExecutorHelperL2.Native memory swap,
     uint256 poolIndex,
-    uint256 sequenceIndex
+    uint256 sequenceIndex,
+    uint8 recipientFlag
   ) external pure returns (bytes memory shortData) {
     shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
-    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.target));
+    if (poolIndex == 0) {
+      shortData = bytes.concat(shortData, bytes20(0xEAd050515E10fDB3540ccD6f8236C46790508A76));
+    }
 
     if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
     else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
 
-    shortData = bytes.concat(shortData, bytes4(uint32(swap.data.length)));
-    shortData = bytes.concat(shortData, bytes(swap.data));
+    bytes memory txData =
+      hex'e525b10b000000000000000000000000000000000000000000000000000000000000002000000000000000000000000028cacd5e26a719f139e2105ca1efc3d9dc892826000000000000000000000000ff8ba4d1fc3762f6154cc942ccf30049a2a0cec60000000000000000000000000c7bbb021d72db4ffba37bdf4ef055eecdbc0a2900000000000000000000000000000000000000000000000000000000000000000000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000009dd5a918da264750a00000000000000000000000000000000000000000000000000000000066446d6300000000000000000000000000000000000000000000000000031fba4adce8b5aa90a6f1d9aa48e9bc0e8f482b556346000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000026000000000000000000000000067297ee4eb097e072b4ab6f1620268061ae8046400000000000000000000000060cba82ddbf4b5ddcd4398cdd05354c6a790c309000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e0000000000000000000000000000000000000000000000000000000000000036000000000000000000000000000000000000000000000009c419a9b29e355f63800000000000000000000000000000000000000000000000000000000000000413b580ff580901e38e887ac461642a872c28c49639c9a167818a2197b340786ca4a3929d425aeffe47ba889e0611cf6560d88d1e5dc51ff9ef7509b2a89b045ba1b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004120ac97d68f0dd0e1db8e77fe7ecc9dd5d3bdab27f4348eb783383a139335ffd67d7fed87cb5174cbcfab840c05aca6866319df8270376acb0367a0ecb03fabff1c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+    shortData = bytes.concat(shortData, bytes4(uint32(txData.length)));
+    shortData = bytes.concat(shortData, txData);
 
-    shortData = bytes.concat(shortData, bytes20(swap.tokenIn));
-    shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
-    shortData = bytes.concat(shortData, bytes20(swap.recipient));
-    shortData = bytes.concat(shortData, bytes32(swap.multihopAndOffset));
+    shortData = bytes.concat(shortData, bytes20(address(1)));
+
+    shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    if (recipientFlag == 0) {
+      shortData = bytes.concat(shortData, bytes20(swap.recipient));
+    }
+
+    // shortData = bytes.concat(shortData, bytes32(swap.multihopAndOffset));
+    shortData = bytes.concat(shortData, bytes32(uint256(3615561838447072116736)));
   }
 
   function writeBebop(
     IExecutorHelperL2.Bebop memory swap,
     uint256 poolIndex,
-    uint256 sequenceIndex
-  ) external pure returns (bytes memory shortData) {
+    uint256 sequenceIndex,
+    uint8 recipientFlag
+  ) external view returns (bytes memory shortData) {
     shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
-    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.pool));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(address(1)));
 
+    console.log('bebop sequenceIndex ', sequenceIndex);
     if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
     else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
 
-    shortData = bytes.concat(shortData, bytes4(uint32(swap.data.length)));
-    shortData = bytes.concat(shortData, bytes(swap.data));
+    bytes memory txData =
+      hex'4dcebcba000000000000000000000000000000000000000000000000000000006662a4e1000000000000000000000000185a4dc360ce69bdccee33b3784b0282f7961aea00000000000000000000000051c72848c68a965f66fa7a88855f9f7784502a7f0000000000000000000000000000000000000000000000000000031fd03a5b2b000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000e34268a9000000000000000000000000c7c0ada69917a0f3652c45ba2d11206e42c4a4300000000000000000000000000000000000000000000000000000000000000000c44f2c06827682c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000041f4e2951c9f194deba1bc5ae9dad7455564b8b9f9c5d33cca30bfc9362b2d1f23449522fd9e06bc83bb472c326e657f1b15cab6beb89db3b201f0f26c35a3ed7d1c00000000000000000000000000000000000000000000000000000000000000';
+    shortData = bytes.concat(shortData, bytes4(uint32(txData.length)));
+    shortData = bytes.concat(shortData, txData);
 
-    shortData = bytes.concat(shortData, bytes20(swap.tokenIn));
-    shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
-    shortData = bytes.concat(shortData, bytes20(swap.recipient));
+    shortData = bytes.concat(shortData, bytes20(address(2)));
+
+    shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    if (recipientFlag == 0) {
+      shortData = bytes.concat(shortData, bytes20(address(3)));
+    }
   }
 
   function writeSymbioticLRT(
@@ -832,12 +880,10 @@ contract DexWriter {
     if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
     else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
 
-    shortData = bytes.concat(shortData, bytes20(swap.tokenIn));
+    // shortData = bytes.concat(shortData, bytes20(swap.tokenIn));
 
-    if (recipientFlag == 1 || recipientFlag == 2) {
-      shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
-    } else {
-      shortData = bytes.concat(shortData, bytes1(uint8(0)));
+    shortData = bytes.concat(shortData, bytes1(uint8(recipientFlag)));
+    if (recipientFlag == 0) {
       shortData = bytes.concat(shortData, bytes20(swap.recipient));
     }
 

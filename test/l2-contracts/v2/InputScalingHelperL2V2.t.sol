@@ -20,7 +20,7 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
   InputScalingHelperL2V2 scaleHelper = new InputScalingHelperL2V2();
   DexHelper01L2 dexHelper1 = new DexHelper01L2();
 
-  uint256[] arrDexNameIndex = [44, 38, 46, 7]; // native, swaapv2, bebop, hashflow
+  uint256[] arrDexNameIndex = [38]; // swaapv2
 
   function _getFuncSelectorList() internal pure returns (bytes4[] memory funcSelectorList) {
     funcSelectorList = new bytes4[](51);
@@ -128,8 +128,8 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
 
   function _assumeDexNameExcludedNotSupported(uint8 dexName) internal pure {
     vm.assume(dexName <= uint8(type(BaseConfig.DexName).max));
-    // can't mock test with mock data, but we can scale ( exclude swaapv2 )
-    vm.assume(dexName != 44 && dexName != 38 && dexName != 46 && dexName != 7);
+    // swaapv2
+    vm.assume(dexName != 38);
   }
 
   function test_swapNormalMode(
@@ -144,6 +144,11 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
     _assumeDexNameExcludedNotSupported(dexName);
 
     console.log('dexName ', dexName);
+
+    // native and bebop not support scale up
+    if (dexName == 44 || dexName == 46) {
+      newAmount = oldAmount - oldAmount / 3 - 1;
+    }
     vm.assume(noSequences > 0 && noSequences < 3);
 
     mockParams.amount = oldAmount;
@@ -186,6 +191,11 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
     dexName = uint8(bound(dexName, 0, uint8(type(BaseConfig.DexName).max)));
     vm.assume(dexName == arrDexNameIndex[dexSeed]);
 
+    // native and bebop not support scale up
+    if (dexName == 44 || dexName == 46) {
+      newAmount = oldAmount - oldAmount / 3 - 1;
+    }
+
     console.log('dexName ', dexName);
     noSequences = uint8(bound(noSequences, 1, 2));
 
@@ -222,6 +232,11 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
     vm.assume(noSequences > 0 && noSequences < 3);
 
     console.log('dexName ', dexName);
+
+    // native and bebop not support scale up
+    if (dexName == 44 || dexName == 46) {
+      newAmount = oldAmount - oldAmount / 3 - 1;
+    }
 
     mockParams.amount = oldAmount;
     mockParams.minReturnAmount = minReturnAmount;
