@@ -7,13 +7,13 @@ import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 import {IExecutorHelperL2Struct} from 'src/interfaces/IExecutorHelperL2Struct.sol';
 import {IKyberDSLO} from 'src/interfaces/pools/IKyberDSLO.sol';
 import {IKyberLO} from 'src/interfaces/pools/IKyberLO.sol';
-import {DexReader1} from './DexReader1.sol';
-import {DexReader2} from './DexReader2.sol';
-import {DexReader3} from './DexReader3.sol';
-import {DexReader4} from './DexReader4.sol';
-import {DexReader5} from './DexReader5.sol';
-import {DexReader6} from './DexReader6.sol';
-import {DexWriter} from './DexWriter.sol';
+import {DexReader1} from 'test/l2-contracts/base/DexReader1.sol';
+import {DexReader2} from 'test/l2-contracts/base/DexReader2.sol';
+import {DexReader3} from 'test/l2-contracts/base/DexReader3.sol';
+import {DexReader4} from 'test/l2-contracts/base/DexReader4.sol';
+import {DexReader5} from 'test/l2-contracts/base/DexReader5.sol';
+import {DexReader6} from 'test/l2-contracts/base/DexReader6.sol';
+import {DexWriter} from 'test/l2-contracts/base/DexWriter.sol';
 import {ScalingDataL2Lib} from 'src/l2-contracts/ScalingDataL2Lib.sol';
 
 contract Reader is DexReader1, DexReader2, DexReader3, DexReader4, DexReader5, DexReader6 {}

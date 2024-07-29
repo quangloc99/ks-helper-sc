@@ -202,6 +202,15 @@ interface IExecutorHelperL2 is IExecutorHelperL2Struct {
     address nextPool
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
+  function executeWooFiV2(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
   function executeMantis(
     uint256 index,
     bytes memory data,
@@ -239,6 +248,33 @@ interface IExecutorHelperL2 is IExecutorHelperL2Struct {
   ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
 
   function executeGMXGLP(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executePancakeStableSwap(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeMantleUsd(
+    uint256 index,
+    bytes memory data,
+    uint256 previousAmountOut,
+    address tokenIn,
+    bool getPoolOnly,
+    address nextPool
+  ) external payable returns (address tokenOut, uint256 tokenAmountOut, address pool);
+
+  function executeKelp(
     uint256 index,
     bytes memory data,
     uint256 previousAmountOut,

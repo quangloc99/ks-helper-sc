@@ -635,14 +635,19 @@ library DexScaler {
 
     uint256 startByte;
     bytes memory strData;
+    uint256 amountStartByte;
     uint256 amount;
     uint256 multihopAndOffset;
     uint256 strDataStartByte;
 
     (, startByte) = data._readAddress(startByte); // target
+
+    amountStartByte = startByte;
     (amount, startByte) = data._readUint128AsUint256(startByte); // amount
-    (strData, startByte) = data._readBytes(startByte); // data
+
     strDataStartByte = startByte;
+    (strData, startByte) = data._readBytes(startByte); // data
+
     (, startByte) = data._readAddress(startByte); // tokenIn
     (, startByte) = data._readAddress(startByte); // tokenOut
     (, startByte) = data._readAddress(startByte); // recipient
@@ -663,7 +668,9 @@ library DexScaler {
       strData = strData.write32Bytes(amountOutMinOffset, 1, 'ScaleStructDataAmountOutMin');
     }
 
-    return data.writeBytes(strDataStartByte, strData);
+    data.write16Bytes(amountStartByte, amount, 'scaleNativeAmount');
+
+    return data.writeBytes(strDataStartByte + 4, strData);
   }
 
   function scaleBebop(
@@ -676,27 +683,31 @@ library DexScaler {
     uint256 startByte;
     uint256 amount;
     uint256 amountStartByte;
+    uint256 txDataStartByte;
     bytes memory txData;
 
-    (, startByte) = data._readAddress(startByte); // pool
+    (, startByte) = data._readPool(startByte); // pool
 
-    (amount, startByte) = data._readUint128AsUint256(startByte); // amount
     amountStartByte = startByte;
+    (amount, startByte) = data._readUint128AsUint256(startByte); // amount
+    txDataStartByte = startByte;
     (txData, startByte) = data._readBytes(startByte); // data
 
     amount = (amount * newAmount) / oldAmount;
 
-    // update calldata with new swap amount
-    (bytes4 selector, bytes memory callData) = txData.splitCalldata();
+    {
+      // update calldata with new swap amount
+      (bytes4 selector, bytes memory callData) = txData.splitCalldata();
 
-    (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
-      abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
+      (IBebopV3.Single memory s, IBebopV3.MakerSignature memory m,) =
+        abi.decode(callData, (IBebopV3.Single, IBebopV3.MakerSignature, uint256));
 
-    txData = bytes.concat(bytes4(selector), abi.encode(s, m, amount));
+      txData = bytes.concat(bytes4(selector), abi.encode(s, m, amount));
+    }
 
-    data.write32Bytes(amountStartByte, amount, 'scaleBebopAmount');
+    data.write16Bytes(amountStartByte, amount, 'scaleBebopAmount');
 
-    return data.writeBytes(startByte, txData);
+    return data.writeBytes(txDataStartByte + 4, txData);
   }
 
   function scaleMantleUsd(
