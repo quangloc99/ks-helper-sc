@@ -5,6 +5,8 @@ out = "out"
 libs = ["lib"]
 fs_permissions = [{ access = "read", path = "./"}]
 solc = '0.8.25'
+optimizer = true
+optimizer_runs = 999_999
 
 ## Format configs
 [fmt]

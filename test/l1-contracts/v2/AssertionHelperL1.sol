@@ -100,6 +100,15 @@ contract AssertionHelperL1 is Test {
       mockParams.amount * newAmount / oldAmount,
       'router desc amount not scaled properly'
     );
+
+    uint256 expectedMinReturnAmount = mockParams.minReturnAmount * newAmount / oldAmount;
+    if (expectedMinReturnAmount == 0) expectedMinReturnAmount = 1;
+
+    assertEq(
+      exec.desc.minReturnAmount,
+      expectedMinReturnAmount,
+      'router desc min return amount not scaled properly'
+    );
   }
 
   function _assertDexData(

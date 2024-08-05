@@ -122,7 +122,6 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
     uint128 minReturnAmount
   ) internal pure {
     vm.assume(oldAmount != newAmount);
-    // vm.assume(oldAmount > newAmount);
     vm.assume(uint256(minReturnAmount) * newAmount / oldAmount < type(uint128).max);
   }
 
