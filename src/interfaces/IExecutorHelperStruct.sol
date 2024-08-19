@@ -293,8 +293,10 @@ interface IExecutorHelperStruct {
   }
 
   struct Kelp {
+    address pool;
     uint256 amount;
     address tokenIn;
+    address tokenOut;
   }
 
   struct EthenaSusde {

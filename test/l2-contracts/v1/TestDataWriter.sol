@@ -183,8 +183,14 @@ contract TestDataWriter is AssertionHelper {
       fn = _createBebop;
     } else if (dexType == InputScalingHelperL2.DexIndex.MantleUsd) {
       fn = _createMantleUsd;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Kelp) {
+      fn = _createKelp;
     } else if (dexType == InputScalingHelperL2.DexIndex.SymbioticLRT) {
       fn = _createSymbioticLRT;
+    } else if (dexType == InputScalingHelperL2.DexIndex.MaverickV2) {
+      fn = _createMaverickV2;
+    } else if (dexType == InputScalingHelperL2.DexIndex.Integral) {
+      fn = _createIntegral;
     } else {
       // do nothing, since we need to check revert condition from InputScalingHelperL2 contract
       swap.data = bytes('mock data');
@@ -662,6 +668,17 @@ contract TestDataWriter is AssertionHelper {
     swap.data = abi.encode(isWrapAndAmount);
   }
 
+  function _createKelp(uint256 sequenceIndex) internal view returns (IExecutorL2.Swap memory swap) {
+    IExecutorHelperL2.Kelp memory data;
+    data.amount = mockParams.amount;
+    swap.data = writer.writeKelp({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
+  }
+
   function _createSymbioticLRT(uint256 sequenceIndex)
     internal
     view
@@ -670,6 +687,36 @@ contract TestDataWriter is AssertionHelper {
     IExecutorHelperL2.SymbioticLRT memory data;
     data.amount = mockParams.amount;
     swap.data = writer.writeSymbioticLRT({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
+  }
+
+  function _createMaverickV2(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
+    IExecutorHelperL2.MaverickV2 memory data;
+    data.collectAmount = mockParams.amount;
+    swap.data = writer.writeMaverickV2({
+      swap: data,
+      poolIndex: 0,
+      sequenceIndex: sequenceIndex,
+      recipientFlag: mockParams.recipientFlag
+    });
+  }
+
+  function _createIntegral(uint256 sequenceIndex)
+    internal
+    view
+    returns (IExecutorL2.Swap memory swap)
+  {
+    IExecutorHelperL2.Integral memory data;
+    data.collectAmount = mockParams.amount;
+    swap.data = writer.writeIntegral({
       swap: data,
       poolIndex: 0,
       sequenceIndex: sequenceIndex,

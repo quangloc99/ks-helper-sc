@@ -730,6 +730,21 @@ library DexScaler {
     return abi.encode(isWrapAndAmount);
   }
 
+  function scaleKelp(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleKelp'
+    );
+  }
+
   function scaleSymbioticLRT(
     bytes memory data,
     uint256 oldAmount,
@@ -742,6 +757,21 @@ library DexScaler {
     (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
     return data.write16Bytes(
       startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleSymbioticLRT'
+    );
+  }
+
+  function scaleMaverickV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    uint256 startByte;
+
+    (, startByte) = data._readPool(startByte); // pool
+
+    (uint256 amount,) = data._readUint128AsUint256(startByte); // amount
+    return data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleMaverickV2'
     );
   }
 }

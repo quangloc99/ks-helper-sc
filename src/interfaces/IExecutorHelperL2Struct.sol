@@ -379,6 +379,13 @@ interface IExecutorHelperL2Struct {
     IKyberLO.FillBatchOrdersParams params;
   }
 
+  struct Kelp {
+    address pool;
+    uint256 amount;
+    address tokenIn;
+    address tokenOut;
+  }
+
   struct SymbioticLRT {
     address vault;
     uint256 amount;

@@ -10,8 +10,6 @@ import {IKyberLO} from 'src/interfaces/pools/IKyberLO.sol';
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 import {IBebopV3} from 'src/interfaces/pools/IBebopV3.sol';
 
-import {console} from 'forge-std/Test.sol';
-
 contract DexHelper01L2 {
   // Not support SwaapV2
   using BytesHelper for bytes;

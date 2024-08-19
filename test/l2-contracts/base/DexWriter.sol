@@ -868,6 +868,21 @@ contract DexWriter {
     }
   }
 
+  function writeKelp(
+    IExecutorHelperL2.Kelp memory swap,
+    uint256 poolIndex,
+    uint256 sequenceIndex,
+    uint8 recipientFlag
+  ) external pure returns (bytes memory shortData) {
+    shortData = bytes.concat(shortData, bytes3(uint24(poolIndex)));
+    if (poolIndex == 0) shortData = bytes.concat(shortData, bytes20(swap.pool));
+
+    if (sequenceIndex == 0) shortData = bytes.concat(shortData, bytes16(uint128(swap.amount)));
+    else shortData = bytes.concat(shortData, bytes1(swap.amount > 0 ? 1 : 0));
+
+    shortData = bytes.concat(shortData, bytes20(swap.tokenOut));
+  }
+
   function writeSymbioticLRT(
     IExecutorHelperL2.SymbioticLRT memory swap,
     uint256 poolIndex,

@@ -335,11 +335,27 @@ library ScalingDataL2Lib {
     return data.scaleMantleUsd(oldAmount, newAmount);
   }
 
+  function newKelp(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleKelp(oldAmount, newAmount);
+  }
+
   function newSymbioticLRT(
     bytes memory data,
     uint256 oldAmount,
     uint256 newAmount
   ) internal pure returns (bytes memory) {
     return data.scaleSymbioticLRT(oldAmount, newAmount);
+  }
+
+  function newMaverickV2(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleMaverickV2(oldAmount, newAmount);
   }
 }

@@ -10,7 +10,7 @@ import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 contract DeployScaleL2V2Full is Script {
   // @note: Please update this function to make sure this is latest data of supported helpers
   function _getFuncSelectorList() internal pure returns (bytes4[] memory funcSelectorList) {
-    funcSelectorList = new bytes4[](51);
+    funcSelectorList = new bytes4[](53);
     funcSelectorList[0] = IExecutorHelperL2.executeUniswap.selector;
     funcSelectorList[1] = IExecutorHelperL2.executeKSClassic.selector;
     funcSelectorList[2] = IExecutorHelperL2.executeVelodrome.selector;
@@ -62,6 +62,8 @@ contract DeployScaleL2V2Full is Script {
     funcSelectorList[48] = IExecutorHelperL2.executeMaiPSM.selector;
     funcSelectorList[49] = IExecutorHelperL2.executeKelp.selector;
     funcSelectorList[50] = IExecutorHelperL2.executeSymbioticLRT.selector;
+    funcSelectorList[51] = IExecutorHelperL2.executeMaverickV2.selector;
+    funcSelectorList[52] = IExecutorHelperL2.executeIntegral.selector;
   }
 
   function run() external {
