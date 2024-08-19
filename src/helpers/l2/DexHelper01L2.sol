@@ -10,6 +10,8 @@ import {IKyberLO} from 'src/interfaces/pools/IKyberLO.sol';
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
 import {IBebopV3} from 'src/interfaces/pools/IBebopV3.sol';
 
+import {console} from 'forge-std/Test.sol';
+
 contract DexHelper01L2 {
   // Not support SwaapV2
   using BytesHelper for bytes;
@@ -1238,6 +1240,48 @@ contract DexHelper01L2 {
     (uint256 amount,) = _data._readUint128AsUint256(startByte); // amount
     return _data.write16Bytes(
       startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleSymbioticLRT'
+    );
+  }
+
+  function executeMaverickV2(
+    uint256,
+    bytes memory scalingData,
+    uint256,
+    address,
+    bool,
+    address
+  ) external pure returns (bytes memory) {
+    (bytes memory _data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 startByte;
+
+    (, startByte) = _data._readPool(startByte); // pool
+
+    (uint256 amount,) = _data._readUint128AsUint256(startByte); // amount
+    return _data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleMaverickV2'
+    );
+  }
+
+  function executeIntegral(
+    uint256,
+    bytes memory scalingData,
+    uint256,
+    address,
+    bool,
+    address
+  ) external pure returns (bytes memory) {
+    (bytes memory _data, uint256 oldAmount, uint256 newAmount) =
+      abi.decode(scalingData, (bytes, uint256, uint256));
+
+    uint256 startByte;
+
+    (, startByte) = _data._readPool(startByte); // pool
+
+    (uint256 amount,) = _data._readUint128AsUint256(startByte); // amount
+    return _data.write16Bytes(
+      startByte, oldAmount == 0 ? 0 : (amount * newAmount) / oldAmount, 'scaleIntegral'
     );
   }
 }

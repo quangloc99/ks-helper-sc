@@ -236,7 +236,10 @@ contract AssertionHelperL1 is Test {
       fn = assertSfrxETHConvertorData;
     } else if (funcSelector == IExecutorHelper.executeStaderETHx.selector) {
       fn = assertStaderETHxData;
-    } else if (funcSelector == IExecutorHelper.executeMantleUsd.selector) {
+    } else if (
+      funcSelector == IExecutorHelper.executeMantleUsd.selector
+        || funcSelector == IExecutorHelper.executeUsd0PP.selector
+    ) {
       fn = assertMantleUsdData;
     } else if (funcSelector == IExecutorHelper.executePufferFinance.selector) {
       fn = assertPufferFinanceData;
@@ -248,6 +251,11 @@ contract AssertionHelperL1 is Test {
       fn = assertKyberLOData;
     } else if (funcSelector == IExecutorHelper.executeKyberDSLO.selector) {
       fn = assertKyberDSLOData;
+    } else if (
+      funcSelector == IExecutorHelper.executeMaverickV2.selector
+        || funcSelector == IExecutorHelper.executeIntegral.selector
+    ) {
+      fn = assertMaverickV2Data;
     } else {
       // @note change this
       console.log('NOT SUPPORTED');
@@ -621,6 +629,16 @@ contract AssertionHelperL1 is Test {
     IExecutorHelperStruct.SymbioticLRT memory dexStructData =
       abi.decode(dexData, (IExecutorHelperStruct.SymbioticLRT));
     assertEq(dexStructData.amount, mockParams.amount * newAmount / oldAmount);
+  }
+
+  function assertMaverickV2Data(
+    bytes memory dexData,
+    uint256 newAmount,
+    uint256 oldAmount
+  ) internal {
+    IExecutorHelperStruct.MaverickV2 memory dexStructData =
+      abi.decode(dexData, (IExecutorHelperStruct.MaverickV2));
+    assertEq(dexStructData.collectAmount, mockParams.amount * newAmount / oldAmount);
   }
 
   function excludeSighash(bytes calldata rawData) external pure returns (bytes memory) {

@@ -217,6 +217,12 @@ contract TestL1DataWriter is AssertionHelperL1 {
       fn = _createKyberDSLO;
     } else if (dexName == BaseConfig.DexName.SymbioticLRT) {
       fn = _createSymbioticLRT;
+    } else if (dexName == BaseConfig.DexName.MaverickV2) {
+      fn = _createMaverickV2;
+    } else if (dexName == BaseConfig.DexName.Integral) {
+      fn = _createIntegral;
+    } else if (dexName == BaseConfig.DexName.Usd0PP) {
+      fn = _createUsd0PP;
     } else {
       // bebop, swaapv2
       swap.data = bytes('mock data');
@@ -666,5 +672,26 @@ contract TestL1DataWriter is AssertionHelperL1 {
     swap.data = abi.encode(dexStructData);
 
     swap.selectorAndFlags = bytes32(IExecutorHelper.executeSymbioticLRT.selector);
+  }
+
+  function _createMaverickV2() internal view returns (IExecutorL1.Swap memory swap) {
+    IExecutorHelperStruct.MaverickV2 memory dexStructData;
+    dexStructData.collectAmount = mockParams.amount;
+    swap.data = abi.encode(dexStructData);
+
+    swap.selectorAndFlags = bytes32(IExecutorHelper.executeMaverickV2.selector);
+  }
+
+  function _createIntegral() internal view returns (IExecutorL1.Swap memory swap) {
+    IExecutorHelperStruct.MaverickV2 memory dexStructData;
+    dexStructData.collectAmount = mockParams.amount;
+    swap.data = abi.encode(dexStructData);
+
+    swap.selectorAndFlags = bytes32(IExecutorHelper.executeIntegral.selector);
+  }
+
+  function _createUsd0PP() internal view returns (IExecutorL1.Swap memory swap) {
+    swap.data = abi.encode(mockParams.amount);
+    swap.selectorAndFlags = bytes32(IExecutorHelper.executeUsd0PP.selector);
   }
 }

@@ -386,4 +386,20 @@ interface IExecutorHelperL2Struct {
     address recipient;
     bool isVer0;
   }
+
+  struct MaverickV2 {
+    address pool;
+    uint256 collectAmount; // amount that should be transferred to the pool
+    address tokenIn; // not encode for l2
+    address tokenOut; // not encode for l2
+    address recipient;
+  }
+
+  struct Integral {
+    address pool;
+    uint256 collectAmount;
+    address tokenIn; // remove for L2
+    address tokenOut;
+    address recipient;
+  }
 }

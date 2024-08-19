@@ -260,9 +260,9 @@ contract InputScalingHelperL2V2 is Ownable {
         0,
         abi.encode(swap.data, oldAmount, newAmount),
         0,
-        address(41),
+        address(0),
         false,
-        address(123)
+        address(0)
       )
     );
 
