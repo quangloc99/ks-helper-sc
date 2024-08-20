@@ -359,4 +359,19 @@ interface IExecutorHelper is IExecutorHelperStruct {
     bytes memory data,
     uint256 flagsAndPrevAmountOut
   ) external payable returns (uint256);
+
+  function executeMaverickV2(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeIntegral(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
+
+  function executeUsd0PP(
+    bytes memory data,
+    uint256 flagsAndPrevAmountOut
+  ) external payable returns (uint256);
 }

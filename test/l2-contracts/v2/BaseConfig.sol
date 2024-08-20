@@ -53,6 +53,8 @@ contract BaseConfig {
     MantleUsd,
     MaiPSM,
     Kelp,
-    SymbioticLRT
+    SymbioticLRT,
+    MaverickV2,
+    Integral
   }
 }

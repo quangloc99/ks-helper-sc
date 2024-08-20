@@ -725,6 +725,23 @@ contract DexScalersTest is Test {
     assertEq(swapScaled.params.takingAmount, tmpAmount / oldAmount, 'results are not eq');
   }
 
+  function test_scaleKelp(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2Struct.Kelp memory swap;
+    swap.amount = oldAmount;
+
+    bytes memory compressed = writer.writeKelp(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newKelp(oldAmount, newAmount);
+
+    IExecutorHelperL2Struct.Kelp memory swapScaled = abi.decode(
+      reader.readKelp(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2Struct.Kelp)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
+  }
+
   function test_scaleSymbioticLRT(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
     _assumeConditions(oldAmount, newAmount, recipientFlag);
     IExecutorHelperL2Struct.SymbioticLRT memory swap;
@@ -740,5 +757,43 @@ contract DexScalersTest is Test {
 
     assertTrue(compressed.length == scaled.length, 'data should not change length');
     assertEq(swapScaled.amount, (swap.amount * newAmount) / oldAmount, 'results are not eq');
+  }
+
+  function test_scaleMaverickV2(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2Struct.MaverickV2 memory swap;
+    swap.collectAmount = oldAmount;
+
+    bytes memory compressed = writer.writeMaverickV2(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newMaverickV2(oldAmount, newAmount);
+
+    IExecutorHelperL2Struct.MaverickV2 memory swapScaled = abi.decode(
+      reader.readMaverickV2(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2Struct.MaverickV2)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(
+      swapScaled.collectAmount, (swap.collectAmount * newAmount) / oldAmount, 'results are not eq'
+    );
+  }
+
+  function test_scaleIntegral(uint128 oldAmount, uint128 newAmount, uint8 recipientFlag) public {
+    _assumeConditions(oldAmount, newAmount, recipientFlag);
+    IExecutorHelperL2Struct.Integral memory swap;
+    swap.collectAmount = oldAmount;
+
+    bytes memory compressed = writer.writeIntegral(swap, 1, 0, recipientFlag);
+    bytes memory scaled = compressed.newMaverickV2(oldAmount, newAmount);
+
+    IExecutorHelperL2Struct.Integral memory swapScaled = abi.decode(
+      reader.readIntegral(scaled, MOCK_ADDRESS, true, MOCK_ADDRESS, false),
+      (IExecutorHelperL2Struct.Integral)
+    );
+
+    assertTrue(compressed.length == scaled.length, 'data should not change length');
+    assertEq(
+      swapScaled.collectAmount, (swap.collectAmount * newAmount) / oldAmount, 'results are not eq'
+    );
   }
 }

@@ -190,6 +190,7 @@ contract InputScalingHelper {
           || functionSelector == IExecutorHelper.executeSwellETH.selector
           || functionSelector == IExecutorHelper.executeRswETH.selector
           || functionSelector == IExecutorHelper.executeBedrockUniETH.selector
+          || functionSelector == IExecutorHelper.executeUsd0PP.selector
       ) {
         swap.data = ScalingDataLib.newStETHSwap(swap.data, oldAmount, newAmount);
       } else if (
@@ -302,6 +303,11 @@ contract InputScalingHelper {
         swap.data = ScalingDataLib.newBebop(swap.data, oldAmount, newAmount);
       } else if (functionSelector == IExecutorHelper.executeSymbioticLRT.selector) {
         swap.data = ScalingDataLib.newSymbioticLRT(swap.data, oldAmount, newAmount);
+      } else if (
+        functionSelector == IExecutorHelper.executeMaverickV2.selector
+          || functionSelector == IExecutorHelper.executeIntegral.selector
+      ) {
+        swap.data = ScalingDataLib.newMaverickV2(swap.data, oldAmount, newAmount);
       } else {
         // SwaapV2
         revert('AggregationExecutor: Dex type not supported');
