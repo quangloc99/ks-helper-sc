@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import 'forge-std/Script.sol';
 import {console} from 'forge-std/console.sol';
 import {DexHelper01} from 'src/helpers/l1/DexHelper01.sol';
+import {DexHelper02} from 'src/helpers/l1/DexHelper02.sol';
 import {InputScalingHelperV2} from 'src/l1-contracts/InputScalingHelperV2.sol';
 import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
 
@@ -11,6 +12,8 @@ contract DeployScaleL1V2Full is Script {
   // @note: Please update this function to make sure this is latest data of supported helpers
   function _getFuncSelectorList() internal pure returns (bytes4[] memory funcSelectorList) {
     funcSelectorList = new bytes4[](72);
+
+    // h1
     funcSelectorList[0] = IExecutorHelper.executeUniswap.selector;
     funcSelectorList[1] = IExecutorHelper.executeStableSwap.selector;
     funcSelectorList[2] = IExecutorHelper.executeCurve.selector;
@@ -80,6 +83,8 @@ contract DeployScaleL1V2Full is Script {
     funcSelectorList[66] = IExecutorHelper.executeKyberDSLO.selector;
     funcSelectorList[67] = IExecutorHelper.executeKyberLimitOrder.selector;
     funcSelectorList[68] = IExecutorHelper.executeSymbioticLRT.selector;
+
+    // h2
     funcSelectorList[69] = IExecutorHelper.executeMaverickV2.selector;
     funcSelectorList[70] = IExecutorHelper.executeIntegral.selector;
     funcSelectorList[71] = IExecutorHelper.executeUsd0PP.selector;
@@ -88,23 +93,31 @@ contract DeployScaleL1V2Full is Script {
   function run() external {
     InputScalingHelperV2 scaleHelperSc;
     DexHelper01 dexHelper1;
+    DexHelper02 dexHelper2;
 
     uint256 priv = vm.envUint('PRIVATE_KEY');
 
     vm.startBroadcast(priv);
 
-    // deploy Dex helper and Scale helper
-    dexHelper1 = new DexHelper01();
-    console.log('DexHelper 1 deployed at:', address(dexHelper1));
+    // deploy Scale helper and dex helper
     scaleHelperSc = new InputScalingHelperV2();
     console.log('ScaleHelper deployed at:', address(scaleHelperSc));
+
+    dexHelper1 = new DexHelper01();
+    console.log('DexHelper 1 deployed at:', address(dexHelper1));
+    dexHelper2 = new DexHelper02();
+    console.log('DexHelper 2 deployed at:', address(dexHelper2));
 
     // setup helper mappings
     bytes4[] memory funcSelectorList = _getFuncSelectorList();
     uint256 listLength = funcSelectorList.length;
     address[] memory helperList = new address[](listLength);
-    for (uint16 i; i < listLength; i++) {
-      helperList[i] = address(dexHelper1);
+    for (uint256 i; i < listLength; i++) {
+      if (i <= 68) {
+        helperList[i] = address(dexHelper1);
+      } else {
+        helperList[i] = address(dexHelper2);
+      }
     }
     scaleHelperSc.batchUpdateHelpers(funcSelectorList, helperList);
 
