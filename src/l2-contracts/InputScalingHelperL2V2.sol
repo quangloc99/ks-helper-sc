@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {IAggregationExecutorOptimistic as IExecutorHelperL2} from
   '../interfaces/IAggregationExecutorOptimistic.sol';
-import {IExecutorHelper as IExecutorHelperL1} from '../interfaces/IExecutorHelper.sol';
 import {IMetaAggregationRouterV2} from '../interfaces/IMetaAggregationRouterV2.sol';
 import {ScalingDataL2Lib} from './ScalingDataL2Lib.sol';
 import {ExecutorReader} from './ExecutorReader.sol';
 import {CalldataWriter} from './CalldataWriter.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol';
+import '@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol';
+import '@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol';
 
-contract InputScalingHelperL2V2 is Ownable {
+contract InputScalingHelperL2V2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
   using ExecutorReader for bytes;
   using ScalingDataL2Lib for bytes;
 
@@ -29,6 +29,13 @@ contract InputScalingHelperL2V2 is Ownable {
     uint256 partnerPSInfor;
     uint256 expectedReturnAmount;
   }
+
+  function initialize() public initializer {
+    __Ownable_init(msg.sender);
+    __UUPSUpgradeable_init();
+  }
+
+  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   function updateHelper(bytes4 funcSelector, uint256 index, address helper) external onlyOwner {
     helperOf[funcSelector] = helper;

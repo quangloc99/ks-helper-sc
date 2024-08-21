@@ -23,6 +23,15 @@ Function `getScaledInputData` in the `InputScalingHelper` contract
     - Encode the new executor’s data and router’s data
 - Requirements: There isn’t any RFQ swap in input data, else it will be reverted with the message “InputScalingHelper: Can not scale RFQ swap”
 
-## Deploy Scale Helper V2
+## Script of Scale Helper V2
 Remember to check script before run script at `script/YOUR_SCRIPT_FILE`
-- `forge script DeployScaleL1V2 --rpc-url mainnet --chain-id 1 --with-gas-price 10000000000 --broadcast`
+
+### Deployment
+- `forge script DeployScaleL1V2Full --rpc-url mainnet --chain-id 1 --gas-price 10000000000 --broadcast`
+
+### Upgrade
+Clean and rebuild before run script
+Set flag sender 
+Set reference contract inside script
+- `forge clean && forge build`
+- `forge script UpgradeScaleHelperL1V2 --rpc-url mainnet --chain-id 1 --gas-price 10000000000 --sender <OWNER ADDRESS OF PROXY> --broadcast`
