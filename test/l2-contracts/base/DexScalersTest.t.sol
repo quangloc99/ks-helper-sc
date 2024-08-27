@@ -13,10 +13,19 @@ import {DexReader3} from 'test/l2-contracts/base/DexReader3.sol';
 import {DexReader4} from 'test/l2-contracts/base/DexReader4.sol';
 import {DexReader5} from 'test/l2-contracts/base/DexReader5.sol';
 import {DexReader6} from 'test/l2-contracts/base/DexReader6.sol';
+import {DexReader7} from 'test/l2-contracts/base/DexReader7.sol';
 import {DexWriter} from 'test/l2-contracts/base/DexWriter.sol';
 import {ScalingDataL2Lib} from 'src/l2-contracts/ScalingDataL2Lib.sol';
 
-contract Reader is DexReader1, DexReader2, DexReader3, DexReader4, DexReader5, DexReader6 {}
+contract Reader is
+  DexReader1,
+  DexReader2,
+  DexReader3,
+  DexReader4,
+  DexReader5,
+  DexReader6,
+  DexReader7
+{}
 
 contract DexScalersTest is Test {
   using ScalingDataL2Lib for bytes;

@@ -349,11 +349,10 @@ contract InputScalingHelperL2 {
       swap.data = swap.data.newKelp(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.SymbioticLRT) {
       swap.data = swap.data.newSymbioticLRT(oldAmount, newAmount);
-    } else if (
-      DexIndex(functionSelectorIndex) == DexIndex.MaverickV2
-        || DexIndex(functionSelectorIndex) == DexIndex.Integral
-    ) {
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.MaverickV2) {
       swap.data = swap.data.newMaverickV2(oldAmount, newAmount);
+    } else if (DexIndex(functionSelectorIndex) == DexIndex.Integral) {
+      swap.data = swap.data.newIntegral(oldAmount, newAmount);
     } else if (DexIndex(functionSelectorIndex) == DexIndex.SwaapV2) {
       revert('InputScalingHelper: Can not scale SwaapV2 swap');
     } else {

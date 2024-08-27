@@ -358,4 +358,12 @@ library ScalingDataL2Lib {
   ) internal pure returns (bytes memory) {
     return data.scaleMaverickV2(oldAmount, newAmount);
   }
+
+  function newIntegral(
+    bytes memory data,
+    uint256 oldAmount,
+    uint256 newAmount
+  ) internal pure returns (bytes memory) {
+    return data.scaleMaverickV2(oldAmount, newAmount); // using kind of same scaling as MaverickV2
+  }
 }
