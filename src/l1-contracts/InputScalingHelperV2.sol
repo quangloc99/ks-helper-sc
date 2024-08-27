@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol';
+import '@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol';
+import '@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol';
 
 import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 
 import {RevertReasonParser} from 'src/libraries/RevertReasonParser.sol';
 
-contract InputScalingHelperV2 is Ownable {
+contract InputScalingHelperV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
   uint256 private constant _PARTIAL_FILL = 0x01;
   uint256 private constant _REQUIRES_EXTRA_ETH = 0x02;
   uint256 private constant _SHOULD_CLAIM = 0x04;
@@ -45,6 +46,13 @@ contract InputScalingHelperV2 is Ownable {
     uint256 deadline;
     bytes positiveSlippageData;
   }
+
+  function initialize() public initializer {
+    __Ownable_init(msg.sender);
+    __UUPSUpgradeable_init();
+  }
+
+  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   function updateHelper(bytes4 funcSelector, address helper) external onlyOwner {
     helperOf[funcSelector] = helper;

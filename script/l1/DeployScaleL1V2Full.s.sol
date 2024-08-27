@@ -7,6 +7,7 @@ import {DexHelper01} from 'src/helpers/l1/DexHelper01.sol';
 import {DexHelper02} from 'src/helpers/l1/DexHelper02.sol';
 import {InputScalingHelperV2} from 'src/l1-contracts/InputScalingHelperV2.sol';
 import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
+import {Upgrades} from '@openzeppelin-foundry-upgrades/src/Upgrades.sol';
 
 contract DeployScaleL1V2Full is Script {
   // @note: Please update this function to make sure this is latest data of supported helpers
@@ -100,8 +101,10 @@ contract DeployScaleL1V2Full is Script {
     vm.startBroadcast(priv);
 
     // deploy Scale helper and dex helper
-    scaleHelperSc = new InputScalingHelperV2();
-    console.log('ScaleHelper deployed at:', address(scaleHelperSc));
+    address proxy = Upgrades.deployUUPSProxy(
+      'InputScalingHelperV2.sol', abi.encodeCall(InputScalingHelperV2.initialize, ())
+    );
+    console.log('ScaleHelper Proxy deployed at:', address(proxy));
 
     dexHelper1 = new DexHelper01();
     console.log('DexHelper 1 deployed at:', address(dexHelper1));
@@ -119,7 +122,9 @@ contract DeployScaleL1V2Full is Script {
         helperList[i] = address(dexHelper2);
       }
     }
-    scaleHelperSc.batchUpdateHelpers(funcSelectorList, helperList);
+
+    InputScalingHelperV2 instance = InputScalingHelperV2(proxy);
+    instance.batchUpdateHelpers(funcSelectorList, helperList);
 
     vm.stopBroadcast();
   }

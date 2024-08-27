@@ -7,6 +7,10 @@ fs_permissions = [{ access = "read", path = "./"}]
 solc = '0.8.25'
 optimizer = true
 optimizer_runs = 999_999
+ffi = true
+ast = true
+build_info = true
+extra_output = ["storageLayout"]
 
 ## Format configs
 [fmt]

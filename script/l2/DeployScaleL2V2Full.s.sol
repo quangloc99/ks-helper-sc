@@ -6,6 +6,7 @@ import {console} from 'forge-std/console.sol';
 import {DexHelper01L2} from 'src/helpers/l2/DexHelper01L2.sol';
 import {InputScalingHelperL2V2} from 'src/l2-contracts/InputScalingHelperL2V2.sol';
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
+import {Upgrades} from '@openzeppelin-foundry-upgrades/src/Upgrades.sol';
 
 contract DeployScaleL2V2Full is Script {
   // @note: Please update this function to make sure this is latest data of supported helpers
@@ -75,10 +76,13 @@ contract DeployScaleL2V2Full is Script {
     vm.startBroadcast(priv);
 
     // deploy Dex helper and Scale helper
+    address proxy = Upgrades.deployUUPSProxy(
+      'InputScalingHelperL2V2.sol', abi.encodeCall(InputScalingHelperL2V2.initialize, ())
+    );
+    console.log('ScaleHelper Proxy deployed at:', address(proxy));
+
     dexHelper1 = new DexHelper01L2();
     console.log('DexHelper 1 deployed at:', address(dexHelper1));
-    scaleHelperSc = new InputScalingHelperL2V2();
-    console.log('ScaleHelper deployed at:', address(scaleHelperSc));
 
     // setup helper mappings
     bytes4[] memory funcSelectorList = _getFuncSelectorList();
@@ -89,7 +93,9 @@ contract DeployScaleL2V2Full is Script {
       indexList[i] = i;
       helperList[i] = address(dexHelper1);
     }
-    scaleHelperSc.batchUpdateHelpers(funcSelectorList, indexList, helperList);
+
+    InputScalingHelperL2V2 instance = InputScalingHelperL2V2(proxy);
+    instance.batchUpdateHelpers(funcSelectorList, indexList, helperList);
 
     vm.stopBroadcast();
   }
