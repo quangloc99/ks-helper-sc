@@ -13,7 +13,7 @@ contract BaseConfig {
     Velodrome,
     Fraxswap,
     Camelot,
-    StableSwap,
+    StableSwap, // 10
     GMX,
     Mantis,
     Wombat,
@@ -23,7 +23,7 @@ contract BaseConfig {
     NomiswapStable,
     BancorV3,
     Curve,
-    PancakeStableSwap,
+    PancakeStableSwap, // 20
     UniV3ProMM,
     RFQ,
     BalancerV2,
@@ -33,7 +33,7 @@ contract BaseConfig {
     PSM,
     WSTETH,
     StEth,
-    Platypus,
+    Platypus, // 30
     Maverick,
     SyncSwap,
     AlgebraV1,
@@ -42,7 +42,7 @@ contract BaseConfig {
     TraderJoeV2,
     LevelFiV2,
     GMXGLP,
-    Vooi,
+    Vooi, // 40
     VelocoreV2,
     MaticMigrate,
     Kokonut,
@@ -52,7 +52,7 @@ contract BaseConfig {
     Ambient,
     UniV1,
     LighterV2,
-    EtherFieETH,
+    EtherFieETH, // 50
     EtherFiWeETH,
     Kelp,
     EthenaSusde,
@@ -62,7 +62,7 @@ contract BaseConfig {
     WBETH,
     MantleETH,
     FrxETH,
-    SfrxETH,
+    SfrxETH, // 60
     SfrxETHConvertor,
     SwellETH,
     RswETH,
@@ -72,7 +72,7 @@ contract BaseConfig {
     MantleUsd,
     BedrockUniETH,
     MaiPSM,
-    PufferFinance,
+    PufferFinance, // 70
     SymbioticLRT,
     MaverickV2,
     Integral,
