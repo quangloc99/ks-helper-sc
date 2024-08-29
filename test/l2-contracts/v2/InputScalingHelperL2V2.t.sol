@@ -2,6 +2,7 @@
 pragma solidity 0.8.25;
 
 import {Test, console} from 'forge-std/Test.sol';
+import {Vm} from 'forge-std/Vm.sol';
 import {InputScalingHelperL2V2} from 'src/l2-contracts/InputScalingHelperL2V2.sol';
 import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
@@ -15,10 +16,15 @@ import {Reader} from 'test/l2-contracts/base/DexScalersTest.t.sol';
 import {DataWriterL2V2} from './DataWriterL2V2.sol';
 
 import {BaseConfig} from './BaseConfig.sol';
+import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
 contract InputScalingHelperL2V2Test is DataWriterL2V2 {
-  InputScalingHelperL2V2 scaleHelper = new InputScalingHelperL2V2();
-  DexHelper01L2 dexHelper1 = new DexHelper01L2();
+  address deployer = address(9);
+  address impl;
+  address proxy;
+
+  InputScalingHelperL2V2 scaleHelper;
+  DexHelper01L2 dexHelper1;
 
   uint256[] arrDexNameIndex = [38]; // swaapv2
 
@@ -79,6 +85,36 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
     funcSelectorList[52] = IExecutorHelperL2.executeIntegral.selector;
   }
 
+  function _deploy(
+    string memory contractName,
+    bytes memory constructorData
+  ) private returns (address) {
+    bytes memory creationCode = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D).getCode(contractName);
+    address deployedAddress = _deployFromBytecode(abi.encodePacked(creationCode, constructorData));
+    if (deployedAddress == address(0)) {
+      revert(
+        string(
+          abi.encodePacked(
+            'Failed to deploy contract ',
+            contractName,
+            ' using constructor data "',
+            string(constructorData),
+            '"'
+          )
+        )
+      );
+    }
+    return deployedAddress;
+  }
+
+  function _deployFromBytecode(bytes memory bytecode) private returns (address) {
+    address addr;
+    assembly {
+      addr := create(0, add(bytecode, 32), mload(bytecode))
+    }
+    return addr;
+  }
+
   function setUp() public {
     vm.label(address(dexHelper1), 'ScaleHelper SC');
     mockParams.callTarget = makeAddr('callTarget');
@@ -96,6 +132,14 @@ contract InputScalingHelperL2V2Test is DataWriterL2V2 {
 
     address[] memory helperList = new address[](listLength);
     uint256[] memory indexList = new uint256[](listLength);
+
+    vm.startPrank(deployer);
+    dexHelper1 = new DexHelper01L2();
+
+    bytes memory initData = abi.encodeCall(InputScalingHelperL2V2.initialize, ());
+    impl = _deploy('InputScalingHelperL2V2', initData);
+    proxy = _deploy('ERC1967Proxy.sol:ERC1967Proxy', abi.encode(impl, initData));
+    scaleHelper = InputScalingHelperL2V2(proxy);
 
     for (uint16 i; i < listLength; i++) {
       indexList[i] = i;

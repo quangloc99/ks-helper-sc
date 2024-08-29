@@ -2,18 +2,26 @@
 pragma solidity 0.8.25;
 
 import {Test, console} from 'forge-std/Test.sol';
+import {Vm} from 'forge-std/Vm.sol';
 import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
 import {IAggregationExecutor as IExecutorL1} from 'src/interfaces/IAggregationExecutor.sol';
 import {InputScalingHelperV2} from 'src/l1-contracts/InputScalingHelperV2.sol';
 import {DexHelper01} from 'src/helpers/l1/DexHelper01.sol';
+import {DexHelper02} from 'src/helpers/l1/DexHelper02.sol';
 
 import {TestL1DataWriter as TestDataWriter} from './TestL1DataWriter.sol';
 import {BaseConfig} from './BaseConfig.sol';
+import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 
 contract InputScalingHelperL1V2Test is TestDataWriter {
-  InputScalingHelperV2 scaleHelper = new InputScalingHelperV2();
-  DexHelper01 dexHelper1 = new DexHelper01();
+  address deployer = address(9);
+  address impl;
+  address proxy;
+
+  InputScalingHelperV2 scaleHelper;
+  DexHelper01 dexHelper1;
+  DexHelper02 dexHelper2;
   uint16 DEX_NUM;
 
   function _getFuncSelectorList() internal pure returns (bytes4[] memory funcSelectorList) {
@@ -92,6 +100,36 @@ contract InputScalingHelperL1V2Test is TestDataWriter {
     funcSelectorList[71] = IExecutorHelper.executeUsd0PP.selector;
   }
 
+  function _deploy(
+    string memory contractName,
+    bytes memory constructorData
+  ) private returns (address) {
+    bytes memory creationCode = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D).getCode(contractName);
+    address deployedAddress = _deployFromBytecode(abi.encodePacked(creationCode, constructorData));
+    if (deployedAddress == address(0)) {
+      revert(
+        string(
+          abi.encodePacked(
+            'Failed to deploy contract ',
+            contractName,
+            ' using constructor data "',
+            string(constructorData),
+            '"'
+          )
+        )
+      );
+    }
+    return deployedAddress;
+  }
+
+  function _deployFromBytecode(bytes memory bytecode) private returns (address) {
+    address addr;
+    assembly {
+      addr := create(0, add(bytecode, 32), mload(bytecode))
+    }
+    return addr;
+  }
+
   function setUp() public {
     mockParams.callTarget = makeAddr('callTarget');
     mockParams.approveTarget = makeAddr('approveTarget');
@@ -108,11 +146,25 @@ contract InputScalingHelperL1V2Test is TestDataWriter {
 
     address[] memory executorList = new address[](listLength);
 
+    vm.startPrank(deployer);
+    dexHelper1 = new DexHelper01();
+    dexHelper2 = new DexHelper02();
+
+    bytes memory initData = abi.encodeCall(InputScalingHelperV2.initialize, ());
+    impl = _deploy('InputScalingHelperV2', initData);
+    proxy = _deploy('ERC1967Proxy.sol:ERC1967Proxy', abi.encode(impl, initData));
+    scaleHelper = InputScalingHelperV2(proxy);
+
     for (uint16 i; i < listLength; i++) {
-      executorList[i] = address(dexHelper1);
+      if (i <= 68) {
+        executorList[i] = address(dexHelper1);
+      } else {
+        executorList[i] = address(dexHelper2);
+      }
     }
 
     scaleHelper.batchUpdateHelpers(funcSelectorList, executorList);
+    vm.stopPrank();
   }
 
   function _assumeConditions(

@@ -26,8 +26,9 @@ contract InputScalingHelperL2V2 is Initializable, OwnableUpgradeable, UUPSUpgrad
   mapping(uint256 => bytes4) public funcSelectorOf;
 
   struct PositiveSlippageFeeData {
-    uint256 partnerPSInfor;
-    uint256 expectedReturnAmount;
+    uint256 partnerPSInfor; // [partnerReceiver (160 bit) + partnerPercent(80bits) + partnerFeeMode(16 bits)]
+    uint256 amounts; // [minimumPSAmount (128 bits) + expectedReturnAmount (128 bits)]
+    address feeSharingAddress;
   }
 
   function initialize() public initializer {
@@ -228,22 +229,22 @@ contract InputScalingHelperL2V2 is Initializable, OwnableUpgradeable, UUPSUpgrad
   ) internal pure returns (bool isSuccess, bytes memory newData) {
     if (data.length > 32) {
       PositiveSlippageFeeData memory psData = abi.decode(data, (PositiveSlippageFeeData));
-      uint256 left = uint256(psData.expectedReturnAmount >> 128);
-      uint256 right = (uint256(uint128(psData.expectedReturnAmount)) * newAmount) / oldAmount;
+      uint256 left = uint256(psData.amounts >> 128);
+      uint256 right = (uint256(uint128(psData.amounts)) * newAmount) / oldAmount;
       if (right > type(uint128).max) {
         return (false, '');
       }
-      psData.expectedReturnAmount = right | (left << 128);
+      psData.amounts = right | (left << 128);
       data = abi.encode(psData);
     } else if (data.length == 32) {
-      uint256 expectedReturnAmount = abi.decode(data, (uint256));
-      uint256 left = uint256(expectedReturnAmount >> 128);
-      uint256 right = (uint256(uint128(expectedReturnAmount)) * newAmount) / oldAmount;
+      uint256 _amounts = abi.decode(data, (uint256));
+      uint256 left = uint256(_amounts >> 128);
+      uint256 right = (uint256(uint128(_amounts)) * newAmount) / oldAmount;
       if (right > type(uint128).max) {
         return (false, '');
       }
-      expectedReturnAmount = right | (left << 128);
-      data = abi.encode(expectedReturnAmount);
+      _amounts = right | (left << 128);
+      data = abi.encode(_amounts);
     }
 
     return (true, data);
