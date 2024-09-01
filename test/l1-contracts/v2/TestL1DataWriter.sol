@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.26;
 
 import {IMetaAggregationRouterV2} from 'src/interfaces/IMetaAggregationRouterV2.sol';
 import {IAggregationExecutor as IExecutorL1} from 'src/interfaces/IAggregationExecutor.sol';

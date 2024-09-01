@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.26;
 
 import {IExecutorHelper} from 'src/interfaces/IExecutorHelper.sol';
 import {BytesHelper} from 'src/l2-contracts/BytesHelper.sol';
