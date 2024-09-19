@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.26;
 
 import {IExecutorHelperL2Struct as L2Struct} from '../interfaces/IExecutorHelperL2Struct.sol';
 import {IKyberDSLO} from '../interfaces/pools/IKyberDSLO.sol';

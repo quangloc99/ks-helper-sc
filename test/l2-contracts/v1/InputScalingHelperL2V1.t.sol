@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.26;
 
 import {Test, console} from 'forge-std/Test.sol';
 import {InputScalingHelperL2} from 'src/l2-contracts/InputScalingHelperL2.sol';

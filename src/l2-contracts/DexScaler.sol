@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.26;
 
 import {CalldataReader} from 'src/l2-contracts/CalldataReader.sol';
 import {IExecutorHelperL2} from 'src/interfaces/IExecutorHelperL2.sol';
